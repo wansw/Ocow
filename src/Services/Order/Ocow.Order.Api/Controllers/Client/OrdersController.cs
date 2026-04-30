@@ -1,0 +1,66 @@
+using Microsoft.AspNetCore.Mvc;
+using Ocow.Order.Application.Dtos;
+using Ocow.Order.Application.Interfaces;
+using Ocow.Shared.Dtos;
+
+namespace Ocow.Order.Api.Controllers.Client;
+
+/// <summary>
+/// 小程序订单接口，用于会员下单、查询和取消订单。
+/// </summary>
+[ApiController]
+[Route("api/orders")]
+public class OrdersController : ControllerBase
+{
+    private readonly IOrderAppService _orderAppService;
+
+    public OrdersController(IOrderAppService orderAppService)
+    {
+        _orderAppService = orderAppService;
+    }
+
+    /// <summary>
+    /// 创建会员订单。
+    /// </summary>
+    [HttpPost]
+    public async Task<ActionResult<ApiResDto<OrderResDto>>> CreateAsync([FromBody] CreateOrderReqDto reqDto, CancellationToken cancellationToken)
+    {
+        var result = await _orderAppService.CreateAsync(reqDto, cancellationToken);
+        return ApiResDto<OrderResDto>.Ok(result, HttpContext.TraceIdentifier);
+    }
+
+    /// <summary>
+    /// 查询当前会员订单列表。
+    /// </summary>
+    [HttpGet]
+    public async Task<ActionResult<ApiResDto<PageResDto<OrderResDto>>>> GetListAsync([FromQuery] Guid customerId, [FromQuery] PageReqDto reqDto, CancellationToken cancellationToken)
+    {
+        var result = await _orderAppService.GetCustomerOrdersAsync(customerId, reqDto, cancellationToken);
+        return ApiResDto<PageResDto<OrderResDto>>.Ok(result, HttpContext.TraceIdentifier);
+    }
+
+    /// <summary>
+    /// 查询订单详情。
+    /// </summary>
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<ApiResDto<OrderResDto>>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _orderAppService.GetByIdAsync(id, cancellationToken);
+        if (result is null)
+        {
+            return NotFound(ApiResDto<OrderResDto>.Fail("ORDER_NOT_FOUND", "订单不存在。", HttpContext.TraceIdentifier));
+        }
+
+        return ApiResDto<OrderResDto>.Ok(result, HttpContext.TraceIdentifier);
+    }
+
+    /// <summary>
+    /// 取消会员订单。
+    /// </summary>
+    [HttpPost("{id:guid}/cancel")]
+    public async Task<ActionResult<ApiResDto<OrderResDto>>> CancelAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _orderAppService.CancelAsync(id, cancellationToken);
+        return ApiResDto<OrderResDto>.Ok(result, HttpContext.TraceIdentifier);
+    }
+}

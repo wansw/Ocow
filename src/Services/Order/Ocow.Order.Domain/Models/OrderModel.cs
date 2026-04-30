@@ -1,0 +1,77 @@
+using Ocow.Order.Domain.Enums;
+
+namespace Ocow.Order.Domain.Models;
+
+/// <summary>
+/// 订单领域模型，用于承载订单主信息和状态流转。
+/// </summary>
+public class OrderModel
+{
+    public Guid Id { get; set; }
+
+    public Guid CustomerId { get; set; }
+
+    public string OrderNo { get; set; } = string.Empty;
+
+    public OrderStatusEnum Status { get; private set; } = OrderStatusEnum.PendingPay;
+
+    public decimal TotalAmount { get; private set; }
+
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public DateTime? CanceledAt { get; private set; }
+
+    public DateTime? ShippedAt { get; private set; }
+
+    public string? ExpressCompany { get; private set; }
+
+    public string? ExpressNo { get; private set; }
+
+    public List<OrderItemModel> Items { get; set; } = new();
+
+    /// <summary>
+    /// 创建待支付订单，并计算订单总金额。
+    /// </summary>
+    public static OrderModel Create(Guid customerId, IEnumerable<OrderItemModel> items)
+    {
+        var orderItems = items.ToList();
+        return new OrderModel
+        {
+            Id = Guid.NewGuid(),
+            CustomerId = customerId,
+            OrderNo = $"OC{DateTime.UtcNow:yyyyMMddHHmmssfff}",
+            Items = orderItems,
+            TotalAmount = orderItems.Sum(x => x.UnitPrice * x.Quantity)
+        };
+    }
+
+    /// <summary>
+    /// 取消待支付订单。
+    /// </summary>
+    public void Cancel()
+    {
+        if (Status != OrderStatusEnum.PendingPay)
+        {
+            throw new InvalidOperationException("只有待支付订单可以取消。");
+        }
+
+        Status = OrderStatusEnum.Canceled;
+        CanceledAt = DateTime.UtcNow;
+    }
+
+    /// <summary>
+    /// 标记订单已发货。
+    /// </summary>
+    public void Ship(string expressCompany, string expressNo)
+    {
+        if (Status is OrderStatusEnum.Canceled or OrderStatusEnum.Completed)
+        {
+            throw new InvalidOperationException("当前订单状态不允许发货。");
+        }
+
+        Status = OrderStatusEnum.Shipped;
+        ExpressCompany = expressCompany;
+        ExpressNo = expressNo;
+        ShippedAt = DateTime.UtcNow;
+    }
+}
