@@ -36,7 +36,7 @@ Ocow 采用「多人多服务开发」架构，不再使用集中式 `Ocow.Api` 
 | `Ocow.Order.Application` | 订单应用层，负责编排下单、取消、发货、同步等用例 |
 | `Ocow.Order.Domain` | 订单领域层，包含订单实体、订单状态、领域规则 |
 | `Ocow.Order.Infrastructure` | 订单基础设施层，包含 EF Core、仓储、Redis、外部服务适配 |
-| `Ocow.Order.Migrations` | 订单服务 EF Core 迁移项目 |
+| `Ocow.Order.Migrations` | 订单服务 EF Core 迁移与种子数据初始化 Console 项目 |
 | `Ocow.Product.*` | 商品服务，负责商品、SKU、类目、品牌、上下架 |
 | `Ocow.Payment.*` | 支付服务，负责支付单、退款、支付回调、微信支付等资金链路 |
 | `Ocow.Identity.*` | 身份认证服务，负责小程序登录、后台管理员登录、角色、权限、Token 签发 |
@@ -367,6 +367,15 @@ EF Core 迁移：放各服务 Migrations
 EF Core 通用封装：放 Ocow.EntityFrameworkCore
 ```
 
+`*.Migrations` 项目必须是可执行 Console 项目，不设计为纯类库：
+
+```text
+OutputType: Exe
+TargetFramework: net8.0
+```
+
+迁移和种子数据初始化入口统一为各服务自己的 `*.Migrations/Program.cs`，API 项目启动时不自动迁移、不自动播种。
+
 以订单服务为例：
 
 ```text
@@ -389,6 +398,8 @@ Ocow.Order.Infrastructure
     OrderDbOption.cs
 
 Ocow.Order.Migrations
+  Program.cs
+  appsettings.json
   Migrations
   DesignTime
     OrderDbContextFactory.cs
@@ -461,6 +472,8 @@ Provider=SqlServer  -> UseSqlServer
 
 ```text
 Ocow.Identity.Migrations
+  Program.cs
+  appsettings.json
   Migrations
   DesignTime
     IdentityDbContextFactory.cs
@@ -469,6 +482,48 @@ Ocow.Identity.Migrations
     IdentityRoleSeeder.cs
     IdentityAdminUserSeeder.cs
     IdentitySeedRunner.cs
+```
+
+`Program.cs` 支持命令：
+
+```text
+migrate       执行 Database.Migrate()
+seed          执行 SeedRunner
+migrate-seed 先执行迁移，再执行种子数据
+```
+
+本地运行示例：
+
+```bash
+dotnet run --project src/Services/Identity/Ocow.Identity.Migrations -- migrate
+dotnet run --project src/Services/Identity/Ocow.Identity.Migrations -- seed
+dotnet run --project src/Services/Identity/Ocow.Identity.Migrations -- migrate-seed
+```
+
+CI/CD 或生产一次性任务示例：
+
+```bash
+dotnet run --project src/Services/Identity/Ocow.Identity.Migrations -- migrate-seed --environment Production
+```
+
+执行入口规则：
+
+- 本地开发由开发者手动运行 `*.Migrations` 项目。
+- 测试环境由 CI/CD 流水线运行 `*.Migrations` 项目。
+- 生产环境由发布流水线、Kubernetes Job 或 Docker 一次性任务运行 `*.Migrations` 项目。
+- `Api` 项目启动时不调用 `Database.Migrate()`。
+- `Api` 项目启动时不执行 Seeder。
+- `Api` 项目不引用对应服务的 `*.Migrations` 项目。
+
+项目引用规则：
+
+```text
+Api -> Application -> Domain
+Api -> Infrastructure
+
+Migrations -> Infrastructure
+Migrations -> Domain
+Migrations -> EntityFrameworkCore
 ```
 
 种子数据职责边界：
@@ -485,9 +540,11 @@ Ocow.Identity.Migrations
 - `Domain` 不引用 EF Core。
 - `Application` 不直接写 EF Core 查询。
 - `Infrastructure` 负责 DbContext、实体映射、仓储实现。
-- `Migrations` 放迁移文件、设计时 DbContext Factory 和具体业务种子数据。
+- `Migrations` 是可执行 Console 项目，放 `Program.cs`、迁移文件、设计时 DbContext Factory 和具体业务种子数据。
 - 每个服务有自己的 DbContext，不共用一个大 DbContext。
 - `Ocow.EntityFrameworkCore` 不放业务实体、不放具体业务 DbContext、不放业务查询、不放具体业务种子数据。
+- 纯类库 `Migrations` 只适合保存迁移文件，不满足当前迁移和种子初始化入口需求。
+- `Api` 不引用 `Migrations`，避免运行时服务被迁移和初始化逻辑污染。
 
 ## 9. Redis 设计
 
@@ -819,5 +876,8 @@ mindmap
 - EF Core 的 DbContext、实体映射配置、仓储实现放各服务 `Infrastructure`。
 - EF Core 迁移文件放各服务 `Migrations`。
 - EF Core 具体业务种子数据放各服务 `Migrations/Seeders`。
+- 各服务 `Migrations` 项目必须是可执行 Console 项目，入口是 `Program.cs`。
+- API 项目启动时不自动迁移、不自动播种。
+- API 项目不引用对应服务的 `Migrations` 项目。
 - EF Core 通用封装放 `Ocow.EntityFrameworkCore`。
 - 默认管理员密码、密钥、Token Secret 等敏感种子配置不能硬编码。

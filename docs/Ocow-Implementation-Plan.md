@@ -29,6 +29,7 @@
 - 建立统一命名、DTO、Options、Models、Enums 目录规范。
 - 建立 EF Core 通用封装和多数据库 Provider 选择规范。
 - 建立 EF Core 通用 Seeder 抽象和业务种子数据放置规范。
+- 建立 `*.Migrations` 可执行 Console 项目模板，统一提供 `Program.cs` 迁移和种子执行入口。
 - 建立 REST API 服务统一 Swagger / OpenAPI 规范。
 
 建议项目：
@@ -62,6 +63,8 @@ src
 - 基础项目引用关系清晰。
 - `Ocow.EntityFrameworkCore` 已创建，包含 EF Core 通用基础接口、拦截器、Provider 配置扩展、通用 Seeder 抽象。
 - `Ocow.Identity.*` 项目已创建，职责边界不和 `Ocow.Member`、`Ocow.WeChat` 混淆。
+- `*.Migrations` 模板明确为 Console 可执行项目，`OutputType=Exe`，`TargetFramework=net8.0`。
+- `*.Migrations/Program.cs` 支持 `migrate`、`seed`、`migrate-seed` 命令。
 - 公共目录规范已确定。
 - Swagger 分组规范已确定，包含 `Client`、`Admin`、`Internal`、`Notify`。
 
@@ -112,6 +115,8 @@ Ocow.Order.Infrastructure
   Options
 
 Ocow.Order.Migrations
+  Program.cs
+  appsettings.json
   Migrations
   DesignTime
     OrderDbContextFactory.cs
@@ -133,6 +138,8 @@ Ocow.Order.Migrations
 - 订单服务可以启动。
 - Swagger 可以查看订单接口，并能区分 `Client`、`Admin`、`Internal` 分组。
 - EF Core 迁移项目可以生成迁移。
+- `Ocow.Order.Migrations` 是 Console 可执行项目，入口是 `Program.cs`。
+- `dotnet run --project src/Services/Order/Ocow.Order.Migrations -- migrate-seed` 可以作为订单数据库初始化命令。
 - 业务实体位于 `Ocow.Order.Domain/Models`，DbContext 和实体映射位于 `Ocow.Order.Infrastructure`。
 - `Ocow.Order.Infrastructure` 通过 `Ocow.EntityFrameworkCore` 选择 PostgreSQL、MySQL 或 SQL Server Provider。
 - 订单服务种子数据位于 `Ocow.Order.Migrations/Seeders`，不放在 `Api`、`Application`、`Domain`、`Infrastructure`。
@@ -263,6 +270,8 @@ Identity 种子数据目录：
 
 ```text
 Ocow.Identity.Migrations
+  Program.cs
+  appsettings.json
   Migrations
   DesignTime
     IdentityDbContextFactory.cs
@@ -282,6 +291,15 @@ Ocow.Identity.Migrations
 权限点、角色、管理员种子数据必须幂等
 ```
 
+迁移和种子执行命令：
+
+```bash
+dotnet run --project src/Services/Identity/Ocow.Identity.Migrations -- migrate
+dotnet run --project src/Services/Identity/Ocow.Identity.Migrations -- seed
+dotnet run --project src/Services/Identity/Ocow.Identity.Migrations -- migrate-seed
+dotnet run --project src/Services/Identity/Ocow.Identity.Migrations -- migrate-seed --environment Production
+```
+
 内部服务调用示例：
 
 ```text
@@ -295,6 +313,7 @@ Ocow.Scheduler -> POST /internal/orders/sync/erp -> Ocow.Order.Api
 - 后台管理员可以绑定角色，角色可以绑定权限点。
 - 后台订单发货接口可以校验 `order.ship` 权限。
 - `Ocow.Identity.Migrations/Seeders` 可以初始化权限点、默认角色、默认管理员。
+- `Ocow.Identity.Migrations/Program.cs` 可以执行 `migrate`、`seed`、`migrate-seed`。
 - 默认管理员密码未硬编码到代码或文档配置样例中。
 - 用户 Token 不能访问内部接口。
 - 管理员 Token 不能访问内部接口。
@@ -492,6 +511,11 @@ Ocow.Member 负责保存会员业务资料
 - EF Core 通用封装位于 `Ocow.EntityFrameworkCore`，各服务的 DbContext 和迁移项目保持独立。
 - `Ocow.EntityFrameworkCore` 只放通用播种机制，不放具体业务种子数据。
 - 具体业务 Seeder 必须位于对应服务的 `*.Migrations/Seeders`。
+- `*.Migrations` 项目必须是 Console 可执行项目，入口是 `Program.cs`。
+- `*.Migrations/Program.cs` 必须支持 `migrate`、`seed`、`migrate-seed` 三个命令。
+- `dotnet run --project src/Services/Identity/Ocow.Identity.Migrations -- migrate-seed` 可以执行。
+- `Api` 项目启动时不自动迁移、不自动播种。
+- `Api` 项目不引用对应服务的 `*.Migrations` 项目。
 - Identity 的权限点、默认角色、默认管理员种子数据位于 `Ocow.Identity.Migrations/Seeders`。
 - 默认管理员密码不能硬编码。
 - 至少验证 PostgreSQL Provider 可用，并保留 MySQL、SQL Server Provider 配置入口。
@@ -508,4 +532,5 @@ Ocow.Member 负责保存会员业务资料
 - Redis、RabbitMQ、Hangfire 先做公共封装和最小示例，不一次性实现所有业务细节。
 - `Ocow.Identity` 负责登录认证和权限管理，`Ocow.Member` 不负责签发 Token。
 - 业务实体放各服务 `Domain/Models`，EF Core 运行时实现放各服务 `Infrastructure`，迁移放各服务 `Migrations`，具体业务种子数据放各服务 `Migrations/Seeders`，通用封装和通用 Seeder 抽象放 `Ocow.EntityFrameworkCore`。
+- 各服务 `*.Migrations` 是可执行 Console 项目，不是纯类库；迁移和种子数据初始化只能通过 `*.Migrations/Program.cs` 或 CI/CD Job 执行。
 - MVP 阶段优先打通订单服务，商品、支付、会员、库存、微信服务按后续阶段逐步补齐。
