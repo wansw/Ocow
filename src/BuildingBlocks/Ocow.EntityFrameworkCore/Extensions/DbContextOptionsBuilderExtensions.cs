@@ -19,13 +19,38 @@ public static class DbContextOptionsBuilderExtensions
             throw new InvalidOperationException("数据库连接字符串不能为空。");
         }
 
-        return option.Provider switch
+        switch (option.Provider)
         {
-            DatabaseProviderEnum.PostgreSql => builder.UseNpgsql(option.ConnectionString),
-            DatabaseProviderEnum.MySql => builder.UseMySql(option.ConnectionString, ServerVersion.AutoDetect(option.ConnectionString)),
-            DatabaseProviderEnum.SqlServer => builder.UseSqlServer(option.ConnectionString),
-            _ => throw new NotSupportedException($"不支持的数据库 Provider：{option.Provider}")
-        };
+            case DatabaseProviderEnum.PostgreSql:
+                return builder.UseNpgsql(option.ConnectionString, provider =>
+                {
+                    if (!string.IsNullOrWhiteSpace(option.MigrationsAssembly))
+                    {
+                        provider.MigrationsAssembly(option.MigrationsAssembly);
+                    }
+                });
+
+            case DatabaseProviderEnum.MySql:
+                return builder.UseMySql(option.ConnectionString, ServerVersion.AutoDetect(option.ConnectionString), provider =>
+                {
+                    if (!string.IsNullOrWhiteSpace(option.MigrationsAssembly))
+                    {
+                        provider.MigrationsAssembly(option.MigrationsAssembly);
+                    }
+                });
+
+            case DatabaseProviderEnum.SqlServer:
+                return builder.UseSqlServer(option.ConnectionString, provider =>
+                {
+                    if (!string.IsNullOrWhiteSpace(option.MigrationsAssembly))
+                    {
+                        provider.MigrationsAssembly(option.MigrationsAssembly);
+                    }
+                });
+
+            default:
+                throw new NotSupportedException($"不支持的数据库 Provider：{option.Provider}");
+        }
     }
 
     /// <summary>

@@ -27,6 +27,11 @@ public static class Program
                 return 0;
             }
 
+            if (!args.Contains("init", StringComparer.OrdinalIgnoreCase))
+            {
+                return 0;
+            }
+
             await using var dbContext = CreateDbContext();
             await InitializeDatabaseAsync(dbContext);
 
@@ -82,7 +87,8 @@ public static class Program
         return new DatabaseOption
         {
             Provider = ResolveProvider(GetEnvironmentValue(serviceName, "DB_PROVIDER") ?? "PostgreSql"),
-            ConnectionString = GetEnvironmentValue(serviceName, "DB_CONNECTION_STRING") ?? defaultConnectionString
+            ConnectionString = GetEnvironmentValue(serviceName, "DB_CONNECTION_STRING") ?? defaultConnectionString,
+            MigrationsAssembly = typeof(Program).Assembly.GetName().Name
         };
     }
 
@@ -110,7 +116,7 @@ public static class Program
     /// </summary>
     private static void PrintUsage()
     {
-        Console.WriteLine("用法：dotnet run --project src/Services/Identity/Ocow.Identity.Migrations/Ocow.Identity.Migrations.csproj -- [--no-seed]");
+        Console.WriteLine("用法：dotnet run --project src/Services/Identity/Ocow.Identity.Migrations/Ocow.Identity.Migrations.csproj -- init [--no-seed]");
         Console.WriteLine("环境变量：OCOW_IDENTITY_DB_PROVIDER、OCOW_IDENTITY_DB_CONNECTION_STRING、OCOW_IDENTITY_ADMIN_PASSWORD");
         Console.WriteLine("可选环境变量：OCOW_IDENTITY_ADMIN_USERNAME、OCOW_IDENTITY_ADMIN_DISPLAY_NAME");
     }

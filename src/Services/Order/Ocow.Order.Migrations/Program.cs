@@ -26,6 +26,11 @@ public static class Program
                 return 0;
             }
 
+            if (!args.Contains("init", StringComparer.OrdinalIgnoreCase))
+            {
+                return 0;
+            }
+
             await using var dbContext = CreateDbContext();
             await InitializeDatabaseAsync(dbContext);
 
@@ -72,7 +77,8 @@ public static class Program
         return new DatabaseOption
         {
             Provider = ResolveProvider(GetEnvironmentValue(serviceName, "DB_PROVIDER") ?? "PostgreSql"),
-            ConnectionString = GetEnvironmentValue(serviceName, "DB_CONNECTION_STRING") ?? defaultConnectionString
+            ConnectionString = GetEnvironmentValue(serviceName, "DB_CONNECTION_STRING") ?? defaultConnectionString,
+            MigrationsAssembly = typeof(Program).Assembly.GetName().Name
         };
     }
 
@@ -100,7 +106,7 @@ public static class Program
     /// </summary>
     private static void PrintUsage()
     {
-        Console.WriteLine("用法：dotnet run --project src/Services/Order/Ocow.Order.Migrations/Ocow.Order.Migrations.csproj");
+        Console.WriteLine("用法：dotnet run --project src/Services/Order/Ocow.Order.Migrations/Ocow.Order.Migrations.csproj -- init");
         Console.WriteLine("环境变量：OCOW_ORDER_DB_PROVIDER、OCOW_ORDER_DB_CONNECTION_STRING");
     }
 }
