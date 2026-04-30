@@ -363,6 +363,7 @@ EF Core 的通用能力抽到 `Ocow.EntityFrameworkCore`，但各业务服务仍
 业务实体：放各服务 Domain/Models
 EF Core 运行时实现：放各服务 Infrastructure
 EF Core 迁移：放各服务 Migrations
+具体业务种子数据：放各服务 Migrations/Seeders
 EF Core 通用封装：放 Ocow.EntityFrameworkCore
 ```
 
@@ -391,6 +392,9 @@ Ocow.Order.Migrations
   Migrations
   DesignTime
     OrderDbContextFactory.cs
+  Seeders
+    OrderStatusSeeder.cs
+    OrderSeedRunner.cs
 ```
 
 `Ocow.EntityFrameworkCore` 建议目录：
@@ -415,6 +419,10 @@ Ocow.EntityFrameworkCore
     ServiceCollectionExtensions.cs
   Repositories
     EfRepositoryBase.cs
+  Seeders
+    IDataSeeder.cs
+    IDataSeedRunner.cs
+    SeedExecutionResult.cs
 ```
 
 多数据库兼容：
@@ -442,14 +450,44 @@ Provider=MySql      -> UseMySql
 Provider=SqlServer  -> UseSqlServer
 ```
 
+种子数据放置规则：
+
+```text
+具体业务种子数据：放各服务自己的 *.Migrations/Seeders
+通用播种执行抽象：放 Ocow.EntityFrameworkCore/Seeders
+```
+
+`Ocow.Identity` 种子数据示例：
+
+```text
+Ocow.Identity.Migrations
+  Migrations
+  DesignTime
+    IdentityDbContextFactory.cs
+  Seeders
+    IdentityPermissionSeeder.cs
+    IdentityRoleSeeder.cs
+    IdentityAdminUserSeeder.cs
+    IdentitySeedRunner.cs
+```
+
+种子数据职责边界：
+
+- 权限点、默认角色、默认管理员账号放 `Ocow.Identity.Migrations/Seeders`。
+- 商品分类、测试商品放 `Ocow.Product.Migrations/Seeders`。
+- 订单初始化数据放 `Ocow.Order.Migrations/Seeders`。
+- `Ocow.EntityFrameworkCore` 只放通用播种机制，不放任何具体业务种子数据。
+- 默认管理员密码不能硬编码，应从环境变量、安全配置或密钥管理服务读取。
+- 种子数据执行应具备幂等性，重复执行不能产生重复管理员、重复角色、重复权限点。
+
 约束：
 
 - `Domain` 不引用 EF Core。
 - `Application` 不直接写 EF Core 查询。
 - `Infrastructure` 负责 DbContext、实体映射、仓储实现。
-- `Migrations` 只放迁移文件和设计时 DbContext Factory。
+- `Migrations` 放迁移文件、设计时 DbContext Factory 和具体业务种子数据。
 - 每个服务有自己的 DbContext，不共用一个大 DbContext。
-- `Ocow.EntityFrameworkCore` 不放业务实体、不放具体业务 DbContext、不放业务查询。
+- `Ocow.EntityFrameworkCore` 不放业务实体、不放具体业务 DbContext、不放业务查询、不放具体业务种子数据。
 
 ## 9. Redis 设计
 
@@ -780,4 +818,6 @@ mindmap
 - Infrastructure 负责数据库、Redis、MQ、第三方接口。
 - EF Core 的 DbContext、实体映射配置、仓储实现放各服务 `Infrastructure`。
 - EF Core 迁移文件放各服务 `Migrations`。
+- EF Core 具体业务种子数据放各服务 `Migrations/Seeders`。
 - EF Core 通用封装放 `Ocow.EntityFrameworkCore`。
+- 默认管理员密码、密钥、Token Secret 等敏感种子配置不能硬编码。

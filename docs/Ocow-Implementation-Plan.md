@@ -28,6 +28,7 @@
 - 创建 `Ocow.Redis`、`Ocow.MessageBus`、`Ocow.InternalAuth`、`Ocow.EntityFrameworkCore`、`Ocow.Identity.*` 基础项目。
 - 建立统一命名、DTO、Options、Models、Enums 目录规范。
 - 建立 EF Core 通用封装和多数据库 Provider 选择规范。
+- 建立 EF Core 通用 Seeder 抽象和业务种子数据放置规范。
 - 建立 REST API 服务统一 Swagger / OpenAPI 规范。
 
 建议项目：
@@ -59,7 +60,7 @@ src
 - `Ocow.Gateway` 可以启动。
 - Ocelot 配置文件存在。
 - 基础项目引用关系清晰。
-- `Ocow.EntityFrameworkCore` 已创建，包含 EF Core 通用基础接口、拦截器、Provider 配置扩展。
+- `Ocow.EntityFrameworkCore` 已创建，包含 EF Core 通用基础接口、拦截器、Provider 配置扩展、通用 Seeder 抽象。
 - `Ocow.Identity.*` 项目已创建，职责边界不和 `Ocow.Member`、`Ocow.WeChat` 混淆。
 - 公共目录规范已确定。
 - Swagger 分组规范已确定，包含 `Client`、`Admin`、`Internal`、`Notify`。
@@ -114,6 +115,9 @@ Ocow.Order.Migrations
   Migrations
   DesignTime
     OrderDbContextFactory.cs
+  Seeders
+    OrderStatusSeeder.cs
+    OrderSeedRunner.cs
 ```
 
 路由：
@@ -131,6 +135,7 @@ Ocow.Order.Migrations
 - EF Core 迁移项目可以生成迁移。
 - 业务实体位于 `Ocow.Order.Domain/Models`，DbContext 和实体映射位于 `Ocow.Order.Infrastructure`。
 - `Ocow.Order.Infrastructure` 通过 `Ocow.EntityFrameworkCore` 选择 PostgreSQL、MySQL 或 SQL Server Provider。
+- 订单服务种子数据位于 `Ocow.Order.Migrations/Seeders`，不放在 `Api`、`Application`、`Domain`、`Infrastructure`。
 - 小程序、后台、内部接口路由隔离清楚。
 
 ## 4. 第三阶段：网关联调
@@ -170,6 +175,7 @@ Ocow.Gateway
 - 实现小程序登录入口。
 - 实现后台管理员登录入口。
 - 实现管理员、角色、权限点管理基础接口。
+- 在 `Ocow.Identity.Migrations/Seeders` 增加权限点、默认角色、默认管理员种子数据。
 - 实现 `Customer JWT` 基础校验策略。
 - 实现 `Admin JWT` 基础校验策略。
 - 实现 `Ocow.InternalAuth` 的 `Service JWT` 校验。
@@ -253,6 +259,29 @@ Ocow.Member 负责会员资料、地址、等级、积分
 Ocow.WeChat 负责微信官方接口调用
 ```
 
+Identity 种子数据目录：
+
+```text
+Ocow.Identity.Migrations
+  Migrations
+  DesignTime
+    IdentityDbContextFactory.cs
+  Seeders
+    IdentityPermissionSeeder.cs
+    IdentityRoleSeeder.cs
+    IdentityAdminUserSeeder.cs
+    IdentitySeedRunner.cs
+```
+
+种子数据安全要求：
+
+```text
+默认管理员账号可以配置默认值
+默认管理员密码不能硬编码
+默认管理员密码必须从环境变量、安全配置或密钥管理服务读取
+权限点、角色、管理员种子数据必须幂等
+```
+
 内部服务调用示例：
 
 ```text
@@ -265,6 +294,8 @@ Ocow.Scheduler -> POST /internal/orders/sync/erp -> Ocow.Order.Api
 - 后台管理员登录成功后可以签发 `Admin JWT`。
 - 后台管理员可以绑定角色，角色可以绑定权限点。
 - 后台订单发货接口可以校验 `order.ship` 权限。
+- `Ocow.Identity.Migrations/Seeders` 可以初始化权限点、默认角色、默认管理员。
+- 默认管理员密码未硬编码到代码或文档配置样例中。
 - 用户 Token 不能访问内部接口。
 - 管理员 Token 不能访问内部接口。
 - Service Token 可以访问授权内部接口。
@@ -459,6 +490,10 @@ Ocow.Member 负责保存会员业务资料
 - 高风险后台操作具备审计日志。
 - Redis、RabbitMQ、Hangfire、Ocelot 均有最小可运行验证。
 - EF Core 通用封装位于 `Ocow.EntityFrameworkCore`，各服务的 DbContext 和迁移项目保持独立。
+- `Ocow.EntityFrameworkCore` 只放通用播种机制，不放具体业务种子数据。
+- 具体业务 Seeder 必须位于对应服务的 `*.Migrations/Seeders`。
+- Identity 的权限点、默认角色、默认管理员种子数据位于 `Ocow.Identity.Migrations/Seeders`。
+- 默认管理员密码不能硬编码。
 - 至少验证 PostgreSQL Provider 可用，并保留 MySQL、SQL Server Provider 配置入口。
 - 代码目录符合 DTO、Options、Models、Enums 命名约定。
 - 新增方法和接口均有中文注释说明作用。
@@ -472,5 +507,5 @@ Ocow.Member 负责保存会员业务资料
 - 数据库默认 PostgreSQL，同时预留 MySQL、SQL Server 兼容能力。
 - Redis、RabbitMQ、Hangfire 先做公共封装和最小示例，不一次性实现所有业务细节。
 - `Ocow.Identity` 负责登录认证和权限管理，`Ocow.Member` 不负责签发 Token。
-- 业务实体放各服务 `Domain/Models`，EF Core 运行时实现放各服务 `Infrastructure`，迁移放各服务 `Migrations`，通用封装放 `Ocow.EntityFrameworkCore`。
+- 业务实体放各服务 `Domain/Models`，EF Core 运行时实现放各服务 `Infrastructure`，迁移放各服务 `Migrations`，具体业务种子数据放各服务 `Migrations/Seeders`，通用封装和通用 Seeder 抽象放 `Ocow.EntityFrameworkCore`。
 - MVP 阶段优先打通订单服务，商品、支付、会员、库存、微信服务按后续阶段逐步补齐。
