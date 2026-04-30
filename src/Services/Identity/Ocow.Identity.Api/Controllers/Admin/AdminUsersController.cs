@@ -17,6 +17,9 @@ public class AdminUsersController : ControllerBase
 {
     private readonly IAdminUserAppService _adminUserAppService;
 
+    /// <summary>
+    /// 创建后台管理员 Controller。
+    /// </summary>
     public AdminUsersController(IAdminUserAppService adminUserAppService)
     {
         _adminUserAppService = adminUserAppService;

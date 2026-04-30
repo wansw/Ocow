@@ -7,10 +7,16 @@ namespace Ocow.Shared.Middleware;
 /// </summary>
 public class RequestTraceMiddleware
 {
+    /// <summary>
+    /// 请求编号请求头名称。
+    /// </summary>
     public const string RequestIdHeader = "X-Request-Id";
 
     private readonly RequestDelegate _next;
 
+    /// <summary>
+    /// 创建请求链路中间件。
+    /// </summary>
     public RequestTraceMiddleware(RequestDelegate next)
     {
         _next = next;

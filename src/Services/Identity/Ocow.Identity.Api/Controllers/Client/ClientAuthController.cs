@@ -14,6 +14,9 @@ public class ClientAuthController : ControllerBase
 {
     private readonly IClientAuthAppService _clientAuthAppService;
 
+    /// <summary>
+    /// 创建小程序认证 Controller。
+    /// </summary>
     public ClientAuthController(IClientAuthAppService clientAuthAppService)
     {
         _clientAuthAppService = clientAuthAppService;

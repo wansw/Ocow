@@ -13,6 +13,9 @@ public class ClientAuthAppService : IClientAuthAppService
     private readonly IIdentityRepository _repository;
     private readonly ITokenService _tokenService;
 
+    /// <summary>
+    /// 创建小程序认证应用服务。
+    /// </summary>
     public ClientAuthAppService(IIdentityRepository repository, ITokenService tokenService)
     {
         _repository = repository;

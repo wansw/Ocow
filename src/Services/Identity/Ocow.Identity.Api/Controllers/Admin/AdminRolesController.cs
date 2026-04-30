@@ -17,6 +17,9 @@ public class AdminRolesController : ControllerBase
 {
     private readonly IRolePermissionAppService _rolePermissionAppService;
 
+    /// <summary>
+    /// 创建后台角色 Controller。
+    /// </summary>
     public AdminRolesController(IRolePermissionAppService rolePermissionAppService)
     {
         _rolePermissionAppService = rolePermissionAppService;

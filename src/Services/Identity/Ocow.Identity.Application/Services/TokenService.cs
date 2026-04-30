@@ -17,6 +17,9 @@ public class TokenService : ITokenService
 {
     private readonly JwtTokenOption _option;
 
+    /// <summary>
+    /// 创建 Token 服务。
+    /// </summary>
     public TokenService(IOptions<JwtTokenOption> option)
     {
         _option = option.Value;

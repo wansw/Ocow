@@ -17,6 +17,9 @@ public class InternalOrderSyncController : ControllerBase
 {
     private readonly IOrderAppService _orderAppService;
 
+    /// <summary>
+    /// 创建内部订单同步 Controller。
+    /// </summary>
     public InternalOrderSyncController(IOrderAppService orderAppService)
     {
         _orderAppService = orderAppService;

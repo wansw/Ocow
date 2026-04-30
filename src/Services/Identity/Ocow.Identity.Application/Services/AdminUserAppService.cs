@@ -12,6 +12,9 @@ public class AdminUserAppService : IAdminUserAppService
 {
     private readonly IIdentityRepository _repository;
 
+    /// <summary>
+    /// 创建管理员应用服务。
+    /// </summary>
     public AdminUserAppService(IIdentityRepository repository)
     {
         _repository = repository;

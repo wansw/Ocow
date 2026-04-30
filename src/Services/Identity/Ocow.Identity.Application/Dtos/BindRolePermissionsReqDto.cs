@@ -5,5 +5,8 @@ namespace Ocow.Identity.Application.Dtos;
 /// </summary>
 public class BindRolePermissionsReqDto
 {
+    /// <summary>
+    /// 需要绑定到角色的权限点编号列表。
+    /// </summary>
     public List<Guid> PermissionIds { get; init; } = new();
 }

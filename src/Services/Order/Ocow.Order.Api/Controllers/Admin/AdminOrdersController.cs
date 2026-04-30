@@ -17,6 +17,9 @@ public class AdminOrdersController : ControllerBase
 {
     private readonly IOrderAppService _orderAppService;
 
+    /// <summary>
+    /// 创建后台订单 Controller。
+    /// </summary>
     public AdminOrdersController(IOrderAppService orderAppService)
     {
         _orderAppService = orderAppService;

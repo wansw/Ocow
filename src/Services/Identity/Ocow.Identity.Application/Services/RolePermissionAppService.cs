@@ -11,6 +11,9 @@ public class RolePermissionAppService : IRolePermissionAppService
 {
     private readonly IIdentityRepository _repository;
 
+    /// <summary>
+    /// 创建角色权限应用服务。
+    /// </summary>
     public RolePermissionAppService(IIdentityRepository repository)
     {
         _repository = repository;

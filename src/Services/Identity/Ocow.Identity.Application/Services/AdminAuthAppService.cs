@@ -13,6 +13,9 @@ public class AdminAuthAppService : IAdminAuthAppService
     private readonly IIdentityRepository _repository;
     private readonly ITokenService _tokenService;
 
+    /// <summary>
+    /// 创建后台认证应用服务。
+    /// </summary>
     public AdminAuthAppService(IIdentityRepository repository, ITokenService tokenService)
     {
         _repository = repository;

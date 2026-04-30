@@ -17,6 +17,9 @@ public class OrdersController : ControllerBase
 {
     private readonly IOrderAppService _orderAppService;
 
+    /// <summary>
+    /// 创建小程序订单 Controller。
+    /// </summary>
     public OrdersController(IOrderAppService orderAppService)
     {
         _orderAppService = orderAppService;

@@ -5,14 +5,29 @@ namespace Ocow.Shared.Dtos;
 /// </summary>
 public class ApiResDto<T>
 {
+    /// <summary>
+    /// 是否处理成功。
+    /// </summary>
     public bool Success { get; init; }
 
+    /// <summary>
+    /// 业务响应编码，成功时默认为 0。
+    /// </summary>
     public string Code { get; init; } = "0";
 
+    /// <summary>
+    /// 响应消息，用于展示成功或失败原因。
+    /// </summary>
     public string Message { get; init; } = "success";
 
+    /// <summary>
+    /// 响应业务数据。
+    /// </summary>
     public T? Data { get; init; }
 
+    /// <summary>
+    /// 请求链路编号，用于日志追踪。
+    /// </summary>
     public string? TraceId { get; init; }
 
     /// <summary>

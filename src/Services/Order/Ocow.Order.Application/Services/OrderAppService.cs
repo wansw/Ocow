@@ -12,6 +12,9 @@ public class OrderAppService : IOrderAppService
 {
     private readonly IOrderRepository _orderRepository;
 
+    /// <summary>
+    /// 创建订单应用服务。
+    /// </summary>
     public OrderAppService(IOrderRepository orderRepository)
     {
         _orderRepository = orderRepository;

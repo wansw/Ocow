@@ -14,6 +14,9 @@ public class AdminAuthController : ControllerBase
 {
     private readonly IAdminAuthAppService _adminAuthAppService;
 
+    /// <summary>
+    /// 创建后台认证 Controller。
+    /// </summary>
     public AdminAuthController(IAdminAuthAppService adminAuthAppService)
     {
         _adminAuthAppService = adminAuthAppService;
