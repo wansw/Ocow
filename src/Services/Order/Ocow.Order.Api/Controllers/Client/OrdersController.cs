@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Ocow.InternalAuth.Extensions;
 using Ocow.Order.Application.Dtos;
 using Ocow.Order.Application.Interfaces;
 using Ocow.Shared.Dtos;
@@ -10,6 +12,7 @@ namespace Ocow.Order.Api.Controllers.Client;
 /// </summary>
 [ApiController]
 [Route("api/orders")]
+[Authorize(Policy = InternalAuthServiceCollectionExtensions.CustomerOnlyPolicy)]
 public class OrdersController : ControllerBase
 {
     private readonly IOrderAppService _orderAppService;

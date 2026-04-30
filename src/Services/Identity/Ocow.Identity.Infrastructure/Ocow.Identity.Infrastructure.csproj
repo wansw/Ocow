@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Ocow.Identity.Domain\Ocow.Identity.Domain.csproj" />
     <ProjectReference Include="..\Ocow.Identity.Application\Ocow.Identity.Application.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.EntityFrameworkCore\Ocow.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

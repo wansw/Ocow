@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ocow.Order.Infrastructure\Ocow.Order.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.EntityFrameworkCore\Ocow.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
 </Project>

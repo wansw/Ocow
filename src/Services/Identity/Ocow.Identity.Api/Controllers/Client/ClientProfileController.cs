@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Ocow.InternalAuth.Extensions;
 using Ocow.Identity.Application.Dtos;
 using Ocow.Shared.Dtos;
 
@@ -9,6 +11,7 @@ namespace Ocow.Identity.Api.Controllers.Client;
 /// </summary>
 [ApiController]
 [Route("api/auth")]
+[Authorize(Policy = InternalAuthServiceCollectionExtensions.CustomerOnlyPolicy)]
 public class ClientProfileController : ControllerBase
 {
     /// <summary>

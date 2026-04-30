@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Ocow.InternalAuth.Extensions;
 using Ocow.Order.Application.Dtos;
 using Ocow.Order.Application.Interfaces;
 using Ocow.Shared.Dtos;
@@ -10,6 +12,7 @@ namespace Ocow.Order.Api.Controllers.Admin;
 /// </summary>
 [ApiController]
 [Route("api/admin/orders")]
+[Authorize(Policy = InternalAuthServiceCollectionExtensions.AdminOnlyPolicy)]
 public class AdminOrdersController : ControllerBase
 {
     private readonly IOrderAppService _orderAppService;
@@ -47,6 +50,7 @@ public class AdminOrdersController : ControllerBase
     /// <summary>
     /// 后台执行订单发货。
     /// </summary>
+    [Authorize(Policy = InternalAuthServiceCollectionExtensions.OrderShipPolicy)]
     [HttpPut("{id:guid}/ship")]
     public async Task<ActionResult<ApiResDto<OrderResDto>>> ShipAsync(Guid id, [FromBody] ShipOrderReqDto reqDto, CancellationToken cancellationToken)
     {

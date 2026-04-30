@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Ocow.EntityFrameworkCore.Extensions;
+using Ocow.EntityFrameworkCore.Options;
 using Ocow.Identity.Application.Interfaces;
 using Ocow.Identity.Infrastructure.Data;
-using Ocow.Identity.Infrastructure.Options;
 using Ocow.Identity.Infrastructure.Repositories;
 
 namespace Ocow.Identity.Infrastructure.Extensions;
@@ -18,9 +19,12 @@ public static class IdentityInfrastructureServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddIdentityInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        var option = configuration.GetSection("PostgreSql").Get<IdentityPostgreSqlOption>() ?? new IdentityPostgreSqlOption();
-        services.Configure<IdentityPostgreSqlOption>(configuration.GetSection("PostgreSql"));
-        services.AddDbContext<IdentityDbContext>(builder => builder.UseNpgsql(option.ConnectionString));
+        var option = configuration.GetSection("Database").Get<DatabaseOption>() ?? new DatabaseOption();
+        services.Configure<DatabaseOption>(configuration.GetSection("Database"));
+        services.AddOcowEntityFrameworkCore();
+        services.AddDbContext<IdentityDbContext>(builder => builder
+            .UseOcowDatabase(option)
+            .AddOcowSaveChangesInterceptors());
         services.AddScoped<IIdentityRepository, IdentityRepository>();
 
         return services;

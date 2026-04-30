@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Ocow.EntityFrameworkCore.Extensions;
+using Ocow.EntityFrameworkCore.Options;
 using Ocow.Identity.Infrastructure.Data;
 
 namespace Ocow.Identity.Migrations.Factories;
@@ -15,7 +17,11 @@ public class IdentityDbContextFactory : IDesignTimeDbContextFactory<IdentityDbCo
     public IdentityDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<IdentityDbContext>();
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=ocow_identity;Username=postgres;Password=postgres123");
+        optionsBuilder.UseOcowDatabase(new DatabaseOption
+        {
+            Provider = DatabaseProviderEnum.PostgreSql,
+            ConnectionString = "Host=localhost;Port=5432;Database=ocow_identity;Username=postgres;Password=postgres123"
+        });
 
         return new IdentityDbContext(optionsBuilder.Options);
     }

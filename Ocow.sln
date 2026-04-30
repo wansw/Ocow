@@ -51,6 +51,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ocow.Identity.Infrastructur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ocow.Identity.Migrations", "src\Services\Identity\Ocow.Identity.Migrations\Ocow.Identity.Migrations.csproj", "{86C40916-E98E-4E3D-B171-4878F2D976FB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ocow.EntityFrameworkCore", "src\BuildingBlocks\Ocow.EntityFrameworkCore\Ocow.EntityFrameworkCore.csproj", "{24A4F54D-1BA7-4612-BC9E-5BF07868B7A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -265,6 +267,18 @@ Global
 		{86C40916-E98E-4E3D-B171-4878F2D976FB}.Release|x64.Build.0 = Release|Any CPU
 		{86C40916-E98E-4E3D-B171-4878F2D976FB}.Release|x86.ActiveCfg = Release|Any CPU
 		{86C40916-E98E-4E3D-B171-4878F2D976FB}.Release|x86.Build.0 = Release|Any CPU
+		{24A4F54D-1BA7-4612-BC9E-5BF07868B7A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24A4F54D-1BA7-4612-BC9E-5BF07868B7A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24A4F54D-1BA7-4612-BC9E-5BF07868B7A9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{24A4F54D-1BA7-4612-BC9E-5BF07868B7A9}.Debug|x64.Build.0 = Debug|Any CPU
+		{24A4F54D-1BA7-4612-BC9E-5BF07868B7A9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{24A4F54D-1BA7-4612-BC9E-5BF07868B7A9}.Debug|x86.Build.0 = Debug|Any CPU
+		{24A4F54D-1BA7-4612-BC9E-5BF07868B7A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24A4F54D-1BA7-4612-BC9E-5BF07868B7A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24A4F54D-1BA7-4612-BC9E-5BF07868B7A9}.Release|x64.ActiveCfg = Release|Any CPU
+		{24A4F54D-1BA7-4612-BC9E-5BF07868B7A9}.Release|x64.Build.0 = Release|Any CPU
+		{24A4F54D-1BA7-4612-BC9E-5BF07868B7A9}.Release|x86.ActiveCfg = Release|Any CPU
+		{24A4F54D-1BA7-4612-BC9E-5BF07868B7A9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -292,5 +306,6 @@ Global
 		{34455E29-31F8-4CF3-BB0D-40FBCACC14FB} = {1BFC9479-12BF-35C3-06B8-42D89D95092B}
 		{A88E6341-7EA9-4239-858A-3D5149B6B0DF} = {1BFC9479-12BF-35C3-06B8-42D89D95092B}
 		{86C40916-E98E-4E3D-B171-4878F2D976FB} = {1BFC9479-12BF-35C3-06B8-42D89D95092B}
+		{24A4F54D-1BA7-4612-BC9E-5BF07868B7A9} = {90298CBA-BD6F-3A0A-69D5-97CAD7B05E7E}
 	EndGlobalSection
 EndGlobal

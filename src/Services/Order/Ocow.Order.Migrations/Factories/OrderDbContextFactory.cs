@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Ocow.EntityFrameworkCore.Extensions;
+using Ocow.EntityFrameworkCore.Options;
 using Ocow.Order.Infrastructure.Data;
 
 namespace Ocow.Order.Migrations.Factories;
@@ -15,7 +17,11 @@ public class OrderDbContextFactory : IDesignTimeDbContextFactory<OrderDbContext>
     public OrderDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<OrderDbContext>();
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=ocow_order;Username=postgres;Password=postgres123");
+        optionsBuilder.UseOcowDatabase(new DatabaseOption
+        {
+            Provider = DatabaseProviderEnum.PostgreSql,
+            ConnectionString = "Host=localhost;Port=5432;Database=ocow_order;Username=postgres;Password=postgres123"
+        });
 
         return new OrderDbContext(optionsBuilder.Options);
     }

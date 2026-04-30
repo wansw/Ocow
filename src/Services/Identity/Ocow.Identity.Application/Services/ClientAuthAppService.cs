@@ -52,17 +52,28 @@ public class ClientAuthAppService : IClientAuthAppService
     /// <summary>
     /// 刷新小程序用户 Token。
     /// </summary>
-    public Task<AuthTokenResDto> RefreshTokenAsync(RefreshTokenReqDto reqDto, CancellationToken cancellationToken = default)
+    public async Task<AuthTokenResDto> RefreshTokenAsync(RefreshTokenReqDto reqDto, CancellationToken cancellationToken = default)
     {
-        throw new NotSupportedException("刷新 Token 的持久化校验将在下一阶段接入。");
+        var oldRefreshToken = await _repository.GetRefreshTokenAsync(reqDto.RefreshToken, "client", cancellationToken) ??
+                              throw new InvalidOperationException("刷新 Token 无效或已过期。");
+
+        var token = _tokenService.IssueToken(oldRefreshToken.SubjectId, "client", Array.Empty<string>(), new[]
+        {
+            new Claim("memberId", oldRefreshToken.SubjectId.ToString())
+        });
+
+        await _repository.RevokeRefreshTokenAsync(reqDto.RefreshToken, "client", cancellationToken);
+        await _repository.SaveRefreshTokenAsync(CreateRefreshToken(oldRefreshToken.SubjectId, "client", token.RefreshToken), cancellationToken);
+
+        return token;
     }
 
     /// <summary>
     /// 退出小程序登录。
     /// </summary>
-    public Task LogoutAsync(RefreshTokenReqDto reqDto, CancellationToken cancellationToken = default)
+    public async Task LogoutAsync(RefreshTokenReqDto reqDto, CancellationToken cancellationToken = default)
     {
-        return Task.CompletedTask;
+        await _repository.RevokeRefreshTokenAsync(reqDto.RefreshToken, "client", cancellationToken);
     }
 
     /// <summary>

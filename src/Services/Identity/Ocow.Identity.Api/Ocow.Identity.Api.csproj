@@ -14,6 +14,7 @@
     <ProjectReference Include="..\Ocow.Identity.Application\Ocow.Identity.Application.csproj" />
     <ProjectReference Include="..\Ocow.Identity.Infrastructure\Ocow.Identity.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.Shared\Ocow.Shared.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.InternalAuth\Ocow.InternalAuth.csproj" />
   </ItemGroup>
 
 </Project>

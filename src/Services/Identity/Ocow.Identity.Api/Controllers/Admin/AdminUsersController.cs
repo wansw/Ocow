@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Ocow.InternalAuth.Extensions;
 using Ocow.Identity.Application.Dtos;
 using Ocow.Identity.Application.Interfaces;
 using Ocow.Shared.Dtos;
@@ -10,6 +12,7 @@ namespace Ocow.Identity.Api.Controllers.Admin;
 /// </summary>
 [ApiController]
 [Route("api/admin/users")]
+[Authorize(Policy = InternalAuthServiceCollectionExtensions.AdminOnlyPolicy)]
 public class AdminUsersController : ControllerBase
 {
     private readonly IAdminUserAppService _adminUserAppService;

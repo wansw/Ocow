@@ -1,3 +1,4 @@
+using Ocow.InternalAuth.Extensions;
 using Ocow.Order.Application.Extensions;
 using Ocow.Order.Infrastructure.Extensions;
 using Ocow.Shared.Extensions;
@@ -9,6 +10,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddOrderApplication();
 builder.Services.AddOrderInfrastructure(builder.Configuration);
+builder.Services.AddOcowJwtAuthorization(builder.Configuration);
 
 var app = builder.Build();
 
@@ -19,6 +21,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseOcowRequestTrace();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapGet("/health", () => Results.Ok(new { service = "Ocow.Order.Api", status = "ok" }))

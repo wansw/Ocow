@@ -165,6 +165,37 @@ public class IdentityRepository : IIdentityRepository
     }
 
     /// <summary>
+    /// 根据刷新 Token 查询有效登录凭证。
+    /// </summary>
+    public async Task<RefreshTokenModel?> GetRefreshTokenAsync(string token, string scope, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.RefreshTokens.FirstOrDefaultAsync(x =>
+            x.Token == token &&
+            x.Scope == scope &&
+            x.RevokedAt == null &&
+            x.ExpiresAt > DateTime.UtcNow, cancellationToken);
+    }
+
+    /// <summary>
+    /// 吊销刷新 Token。
+    /// </summary>
+    public async Task RevokeRefreshTokenAsync(string token, string scope, CancellationToken cancellationToken = default)
+    {
+        var refreshToken = await _dbContext.RefreshTokens.FirstOrDefaultAsync(x =>
+            x.Token == token &&
+            x.Scope == scope &&
+            x.RevokedAt == null, cancellationToken);
+
+        if (refreshToken is null)
+        {
+            return;
+        }
+
+        refreshToken.RevokedAt = DateTime.UtcNow;
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <summary>
     /// 写入登录日志。
     /// </summary>
     public async Task AddLoginLogAsync(LoginLogModel loginLog, CancellationToken cancellationToken = default)

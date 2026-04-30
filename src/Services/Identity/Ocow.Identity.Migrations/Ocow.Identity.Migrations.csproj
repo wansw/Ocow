@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ocow.Identity.Infrastructure\Ocow.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.EntityFrameworkCore\Ocow.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

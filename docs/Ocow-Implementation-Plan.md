@@ -25,8 +25,10 @@
 - 创建解决方案 `Ocow.sln`。
 - 创建 `Ocow.Gateway`，集成 Ocelot。
 - 创建 `Ocow.Shared`、`Ocow.Contracts`。
-- 创建 `Ocow.Redis`、`Ocow.MessageBus`、`Ocow.InternalAuth`、`Ocow.Identity.*` 基础项目。
+- 创建 `Ocow.Redis`、`Ocow.MessageBus`、`Ocow.InternalAuth`、`Ocow.EntityFrameworkCore`、`Ocow.Identity.*` 基础项目。
 - 建立统一命名、DTO、Options、Models、Enums 目录规范。
+- 建立 EF Core 通用封装和多数据库 Provider 选择规范。
+- 建立 REST API 服务统一 Swagger / OpenAPI 规范。
 
 建议项目：
 
@@ -41,6 +43,7 @@ src
     Ocow.Redis
     Ocow.MessageBus
     Ocow.InternalAuth
+    Ocow.EntityFrameworkCore
   Services
     Identity
       Ocow.Identity.Api
@@ -56,8 +59,10 @@ src
 - `Ocow.Gateway` 可以启动。
 - Ocelot 配置文件存在。
 - 基础项目引用关系清晰。
+- `Ocow.EntityFrameworkCore` 已创建，包含 EF Core 通用基础接口、拦截器、Provider 配置扩展。
 - `Ocow.Identity.*` 项目已创建，职责边界不和 `Ocow.Member`、`Ocow.WeChat` 混淆。
 - 公共目录规范已确定。
+- Swagger 分组规范已确定，包含 `Client`、`Admin`、`Internal`、`Notify`。
 
 ## 3. 第二阶段：订单服务 MVP
 
@@ -70,7 +75,8 @@ src
 - 创建 `Ocow.Order.Migrations`。
 - 添加小程序订单 Controller、后台订单 Controller、内部同步 Controller。
 - 添加订单状态枚举、订单基础模型、订单应用服务接口。
-- 接入 EF Core 和 PostgreSQL。
+- 接入 EF Core，默认使用 PostgreSQL，并预留 MySQL、SQL Server Provider 切换能力。
+- 接入 Swagger / OpenAPI，并按 `Client`、`Admin`、`Internal` 分组。
 
 订单服务目录建议：
 
@@ -90,15 +96,24 @@ Ocow.Order.Application
 
 Ocow.Order.Domain
   Models
+    Order.cs
+    OrderItem.cs
   Enums
   Services
 
 Ocow.Order.Infrastructure
-  Models
+  Persistence
+    OrderDbContext.cs
+    Configurations
+      OrderEntityTypeConfiguration.cs
+      OrderItemEntityTypeConfiguration.cs
   Repositories
   Options
 
 Ocow.Order.Migrations
+  Migrations
+  DesignTime
+    OrderDbContextFactory.cs
 ```
 
 路由：
@@ -112,8 +127,10 @@ Ocow.Order.Migrations
 验收标准：
 
 - 订单服务可以启动。
-- Swagger 可以查看订单接口。
+- Swagger 可以查看订单接口，并能区分 `Client`、`Admin`、`Internal` 分组。
 - EF Core 迁移项目可以生成迁移。
+- 业务实体位于 `Ocow.Order.Domain/Models`，DbContext 和实体映射位于 `Ocow.Order.Infrastructure`。
+- `Ocow.Order.Infrastructure` 通过 `Ocow.EntityFrameworkCore` 选择 PostgreSQL、MySQL 或 SQL Server Provider。
 - 小程序、后台、内部接口路由隔离清楚。
 
 ## 4. 第三阶段：网关联调
@@ -125,6 +142,8 @@ Ocow.Order.Migrations
 - 将 `/api/admin/orders/**` 转发到订单服务。
 - 将 `/internal/orders/**` 转发到订单服务。
 - 增加请求 TraceId 中间件。
+- MVP 阶段各服务自己暴露 Swagger，Gateway 暂不聚合 Swagger。
+- 第二阶段预留 Gateway 聚合各服务 Swagger 的方案。
 
 本地路由示例：
 
@@ -141,6 +160,7 @@ Ocow.Gateway
 - 通过 Gateway 可以访问订单服务后台接口。
 - 通过 Gateway 可以访问订单服务内部接口。
 - 日志中可以看到同一个请求的 `TraceId`。
+- 订单服务自身 Swagger 可以独立访问。
 
 ## 5. 第四阶段：登录认证、权限管理与内部调用
 
@@ -429,12 +449,17 @@ Ocow.Member 负责保存会员业务资料
 
 - 每个服务可以独立启动。
 - Gateway 能正确路由到目标服务。
+- 所有 `*.Api` 服务必须接入 Swagger / OpenAPI。
+- Swagger 必须按 `Client`、`Admin`、`Internal`、`Notify` 分组。
+- 开发环境默认开启 Swagger，生产环境默认关闭或仅内网/VPN 访问。
 - 小程序接口、后台接口、内部接口权限隔离清楚。
 - 管理员登录、角色管理、权限点管理具备 MVP 能力。
 - 小程序登录能完成微信授权、会员绑定和 `Customer JWT` 签发。
 - 下单、支付回调、定时任务、微信接口具备幂等或限流设计。
 - 高风险后台操作具备审计日志。
 - Redis、RabbitMQ、Hangfire、Ocelot 均有最小可运行验证。
+- EF Core 通用封装位于 `Ocow.EntityFrameworkCore`，各服务的 DbContext 和迁移项目保持独立。
+- 至少验证 PostgreSQL Provider 可用，并保留 MySQL、SQL Server Provider 配置入口。
 - 代码目录符合 DTO、Options、Models、Enums 命名约定。
 - 新增方法和接口均有中文注释说明作用。
 
@@ -443,7 +468,9 @@ Ocow.Member 负责保存会员业务资料
 - 下一步先按本文档创建骨架代码项目。
 - 网关使用 Ocelot。
 - 本地第一阶段使用 Ocelot 静态路由，不立即接 Consul。
-- 数据库默认 PostgreSQL。
+- MVP 阶段 Swagger 由各服务独立暴露，Gateway 暂不聚合。
+- 数据库默认 PostgreSQL，同时预留 MySQL、SQL Server 兼容能力。
 - Redis、RabbitMQ、Hangfire 先做公共封装和最小示例，不一次性实现所有业务细节。
 - `Ocow.Identity` 负责登录认证和权限管理，`Ocow.Member` 不负责签发 Token。
+- 业务实体放各服务 `Domain/Models`，EF Core 运行时实现放各服务 `Infrastructure`，迁移放各服务 `Migrations`，通用封装放 `Ocow.EntityFrameworkCore`。
 - MVP 阶段优先打通订单服务，商品、支付、会员、库存、微信服务按后续阶段逐步补齐。

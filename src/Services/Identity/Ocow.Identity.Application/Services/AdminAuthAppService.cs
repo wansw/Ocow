@@ -53,17 +53,26 @@ public class AdminAuthAppService : IAdminAuthAppService
     /// <summary>
     /// 刷新后台管理员 Token。
     /// </summary>
-    public Task<AuthTokenResDto> RefreshTokenAsync(RefreshTokenReqDto reqDto, CancellationToken cancellationToken = default)
+    public async Task<AuthTokenResDto> RefreshTokenAsync(RefreshTokenReqDto reqDto, CancellationToken cancellationToken = default)
     {
-        throw new NotSupportedException("刷新 Token 的持久化校验将在下一阶段接入。");
+        var oldRefreshToken = await _repository.GetRefreshTokenAsync(reqDto.RefreshToken, "admin", cancellationToken) ??
+                              throw new InvalidOperationException("刷新 Token 无效或已过期。");
+
+        var permissions = await _repository.GetAdminPermissionCodesAsync(oldRefreshToken.SubjectId, cancellationToken);
+        var token = _tokenService.IssueToken(oldRefreshToken.SubjectId, "admin", permissions);
+
+        await _repository.RevokeRefreshTokenAsync(reqDto.RefreshToken, "admin", cancellationToken);
+        await _repository.SaveRefreshTokenAsync(CreateRefreshToken(oldRefreshToken.SubjectId, "admin", token.RefreshToken), cancellationToken);
+
+        return token;
     }
 
     /// <summary>
     /// 退出后台登录。
     /// </summary>
-    public Task LogoutAsync(RefreshTokenReqDto reqDto, CancellationToken cancellationToken = default)
+    public async Task LogoutAsync(RefreshTokenReqDto reqDto, CancellationToken cancellationToken = default)
     {
-        return Task.CompletedTask;
+        await _repository.RevokeRefreshTokenAsync(reqDto.RefreshToken, "admin", cancellationToken);
     }
 
     /// <summary>

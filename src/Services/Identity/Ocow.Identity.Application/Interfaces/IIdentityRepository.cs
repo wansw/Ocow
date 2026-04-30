@@ -69,6 +69,16 @@ public interface IIdentityRepository
     Task SaveRefreshTokenAsync(RefreshTokenModel refreshToken, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// 根据刷新 Token 查询有效登录凭证。
+    /// </summary>
+    Task<RefreshTokenModel?> GetRefreshTokenAsync(string token, string scope, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 吊销刷新 Token。
+    /// </summary>
+    Task RevokeRefreshTokenAsync(string token, string scope, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// 写入登录日志。
     /// </summary>
     Task AddLoginLogAsync(LoginLogModel loginLog, CancellationToken cancellationToken = default);
