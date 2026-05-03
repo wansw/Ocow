@@ -23,8 +23,8 @@ public static class IdentityInfrastructureServiceCollectionExtensions
         services.Configure<DatabaseOption>(configuration.GetSection("Database"));
         services.AddOcowEntityFrameworkCore();
         services.AddDbContext<IdentityDbContext>(builder => builder
-            .UseOcowDatabase(option)
-            .AddOcowSaveChangesInterceptors());
+                .UseOcowDatabase(option)
+                .AddOcowSaveChangesInterceptors());
         services.AddScoped<IIdentityRepository, IdentityRepository>();
 
         return services;

@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Ocow.Order.Domain.Enums;
 
 namespace Ocow.Order.Domain.Models;
@@ -5,16 +7,21 @@ namespace Ocow.Order.Domain.Models;
 /// <summary>
 /// 订单领域模型，用于承载订单主信息和状态流转。
 /// </summary>
+[Table("orders")]
 public class OrderModel
 {
+    [Key]
     public Guid Id { get; set; }
 
     public Guid CustomerId { get; set; }
 
+    [Required]
+    [MaxLength(64)]
     public string OrderNo { get; set; } = string.Empty;
 
     public OrderStatusEnum Status { get; private set; } = OrderStatusEnum.PendingPay;
 
+    [Column(TypeName = "decimal(18,2)")]
     public decimal TotalAmount { get; private set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -23,10 +30,16 @@ public class OrderModel
 
     public DateTime? ShippedAt { get; private set; }
 
+    [MaxLength(64)]
     public string? ExpressCompany { get; private set; }
 
+    [MaxLength(64)]
     public string? ExpressNo { get; private set; }
 
+    /// <summary>
+    /// 订单明细集合，用于表达订单与订单明细的一对多关系。
+    /// </summary>
+    [InverseProperty(nameof(OrderItemModel.Order))]
     public List<OrderItemModel> Items { get; set; } = new();
 
     /// <summary>

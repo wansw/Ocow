@@ -18,30 +18,16 @@ public class OrderDbContext : DbContext
     public DbSet<OrderItemModel> OrderItems => Set<OrderItemModel>();
 
     /// <summary>
-    /// 配置订单表和订单明细表映射。
+    /// 配置实体特性无法清晰表达的订单关系规则。
     /// </summary>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<OrderModel>(entity =>
         {
-            entity.ToTable("orders");
-            entity.HasKey(x => x.Id);
-            entity.Property(x => x.OrderNo).HasMaxLength(64).IsRequired();
-            entity.Property(x => x.TotalAmount).HasPrecision(18, 2);
-            entity.Property(x => x.ExpressCompany).HasMaxLength(64);
-            entity.Property(x => x.ExpressNo).HasMaxLength(64);
             entity.HasMany(x => x.Items)
-                .WithOne()
+                .WithOne(x => x.Order)
                 .HasForeignKey(x => x.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
-        });
-
-        modelBuilder.Entity<OrderItemModel>(entity =>
-        {
-            entity.ToTable("order_items");
-            entity.HasKey(x => x.Id);
-            entity.Property(x => x.ProductName).HasMaxLength(128).IsRequired();
-            entity.Property(x => x.UnitPrice).HasPrecision(18, 2);
         });
     }
 }

@@ -30,76 +30,54 @@ public class IdentityDbContext : DbContext
     public DbSet<LoginLogModel> LoginLogs => Set<LoginLogModel>();
 
     /// <summary>
-    /// 配置身份服务表结构。
+    /// 配置实体特性无法清晰表达的身份服务索引和复合主键规则。
     /// </summary>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<AdminUserModel>(entity =>
-        {
-            entity.ToTable("admin_users");
-            entity.HasKey(x => x.Id);
-            entity.Property(x => x.UserName).HasMaxLength(64).IsRequired();
-            entity.Property(x => x.PasswordHash).HasMaxLength(128).IsRequired();
-            entity.Property(x => x.DisplayName).HasMaxLength(64).IsRequired();
-            entity.HasIndex(x => x.UserName).IsUnique();
-        });
+        modelBuilder.Entity<AdminUserModel>()
+            .HasIndex(x => x.UserName)
+            .IsUnique();
 
-        modelBuilder.Entity<RoleModel>(entity =>
-        {
-            entity.ToTable("roles");
-            entity.HasKey(x => x.Id);
-            entity.Property(x => x.Code).HasMaxLength(64).IsRequired();
-            entity.Property(x => x.Name).HasMaxLength(64).IsRequired();
-            entity.HasIndex(x => x.Code).IsUnique();
-        });
+        modelBuilder.Entity<RoleModel>()
+            .HasIndex(x => x.Code)
+            .IsUnique();
 
-        modelBuilder.Entity<PermissionModel>(entity =>
-        {
-            entity.ToTable("permissions");
-            entity.HasKey(x => x.Id);
-            entity.Property(x => x.Code).HasMaxLength(64).IsRequired();
-            entity.Property(x => x.Name).HasMaxLength(64).IsRequired();
-            entity.Property(x => x.Module).HasMaxLength(64).IsRequired();
-            entity.HasIndex(x => x.Code).IsUnique();
-        });
+        modelBuilder.Entity<PermissionModel>()
+            .HasIndex(x => x.Code)
+            .IsUnique();
+
+        modelBuilder.Entity<MemberIdentityModel>()
+            .HasIndex(x => x.OpenId)
+            .IsUnique();
+
+        modelBuilder.Entity<RefreshTokenModel>()
+            .HasIndex(x => x.Token)
+            .IsUnique();
 
         modelBuilder.Entity<AdminUserRoleModel>(entity =>
         {
-            entity.ToTable("admin_user_roles");
             entity.HasKey(x => new { x.AdminUserId, x.RoleId });
+            entity.HasOne(x => x.AdminUser)
+                .WithMany(x => x.AdminUserRoles)
+                .HasForeignKey(x => x.AdminUserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(x => x.Role)
+                .WithMany(x => x.AdminUserRoles)
+                .HasForeignKey(x => x.RoleId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<RolePermissionModel>(entity =>
         {
-            entity.ToTable("role_permissions");
             entity.HasKey(x => new { x.RoleId, x.PermissionId });
-        });
-
-        modelBuilder.Entity<MemberIdentityModel>(entity =>
-        {
-            entity.ToTable("member_identities");
-            entity.HasKey(x => x.Id);
-            entity.Property(x => x.OpenId).HasMaxLength(128).IsRequired();
-            entity.Property(x => x.UnionId).HasMaxLength(128);
-            entity.HasIndex(x => x.OpenId).IsUnique();
-        });
-
-        modelBuilder.Entity<RefreshTokenModel>(entity =>
-        {
-            entity.ToTable("refresh_tokens");
-            entity.HasKey(x => x.Id);
-            entity.Property(x => x.Token).HasMaxLength(256).IsRequired();
-            entity.Property(x => x.Scope).HasMaxLength(32).IsRequired();
-            entity.HasIndex(x => x.Token).IsUnique();
-        });
-
-        modelBuilder.Entity<LoginLogModel>(entity =>
-        {
-            entity.ToTable("login_logs");
-            entity.HasKey(x => x.Id);
-            entity.Property(x => x.LoginName).HasMaxLength(128).IsRequired();
-            entity.Property(x => x.Scope).HasMaxLength(32).IsRequired();
-            entity.Property(x => x.FailureReason).HasMaxLength(256);
+            entity.HasOne(x => x.Role)
+                .WithMany(x => x.RolePermissions)
+                .HasForeignKey(x => x.RoleId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(x => x.Permission)
+                .WithMany(x => x.RolePermissions)
+                .HasForeignKey(x => x.PermissionId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }
