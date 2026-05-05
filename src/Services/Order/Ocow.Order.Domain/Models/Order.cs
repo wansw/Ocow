@@ -1,14 +1,13 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Ocow.Order.Domain.Enums;
 
 namespace Ocow.Order.Domain.Models;
 
 /// <summary>
-/// 订单领域模型，用于承载订单主信息和状态流转。
-/// </summary>
+/// 订单领域模型，用于承载订单主信息和状态流转。/// </summary>
 [Table("orders")]
-public class OrderModel
+public class Order
 {
     [Key]
     public Guid Id { get; set; }
@@ -37,18 +36,16 @@ public class OrderModel
     public string? ExpressNo { get; private set; }
 
     /// <summary>
-    /// 订单明细集合，用于表达订单与订单明细的一对多关系。
-    /// </summary>
-    [InverseProperty(nameof(OrderItemModel.Order))]
-    public List<OrderItemModel> Items { get; set; } = new();
+    /// 订单明细集合，用于表达订单与订单明细的一对多关系。    /// </summary>
+    [InverseProperty(nameof(OrderItem.Order))]
+    public List<OrderItem> Items { get; set; } = new();
 
     /// <summary>
-    /// 创建待支付订单，并计算订单总金额。
-    /// </summary>
-    public static OrderModel Create(Guid customerId, IEnumerable<OrderItemModel> items)
+    /// 创建待支付订单，并计算订单总金额。    /// </summary>
+    public static Order Create(Guid customerId, IEnumerable<OrderItem> items)
     {
         var orderItems = items.ToList();
-        return new OrderModel
+        return new Order
         {
             Id = Guid.NewGuid(),
             CustomerId = customerId,
@@ -59,8 +56,7 @@ public class OrderModel
     }
 
     /// <summary>
-    /// 取消待支付订单。
-    /// </summary>
+    /// 取消待支付订单。    /// </summary>
     public void Cancel()
     {
         if (Status != OrderStatusEnum.PendingPay)
@@ -73,8 +69,7 @@ public class OrderModel
     }
 
     /// <summary>
-    /// 标记订单已发货。
-    /// </summary>
+    /// 标记订单已发货。    /// </summary>
     public void Ship(string expressCompany, string expressNo)
     {
         if (Status is OrderStatusEnum.Canceled or OrderStatusEnum.Completed)

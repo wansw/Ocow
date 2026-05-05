@@ -1,8 +1,7 @@
-namespace Ocow.MessageBus.Options;
+﻿namespace Ocow.MessageBus.Options;
 
 /// <summary>
-/// RabbitMQ 配置实体，用于绑定连接地址、账号和交换机。
-/// </summary>
+/// RabbitMQ 配置实体，用于绑定连接地址、账号和交换机。/// </summary>
 public class RabbitMqOption
 {
     public string HostName { get; init; } = "localhost";

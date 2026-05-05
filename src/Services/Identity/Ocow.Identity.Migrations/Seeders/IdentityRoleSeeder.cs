@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Ocow.EntityFrameworkCore.Seeders;
 using Ocow.Identity.Domain.Models;
 using Ocow.Identity.Infrastructure.Data;
@@ -6,8 +6,7 @@ using Ocow.Identity.Infrastructure.Data;
 namespace Ocow.Identity.Migrations.Seeders;
 
 /// <summary>
-/// 身份服务角色播种器，用于幂等初始化超级管理员角色和权限绑定。
-/// </summary>
+/// 身份服务角色播种器，用于幂等初始化超级管理员角色和权限绑定。/// </summary>
 public class IdentityRoleSeeder : IDataSeeder
 {
     private readonly IdentityDbContext _dbContext;
@@ -18,8 +17,7 @@ public class IdentityRoleSeeder : IDataSeeder
     }
 
     /// <summary>
-    /// 执行角色和角色权限种子数据初始化。
-    /// </summary>
+    /// 执行角色和角色权限种子数据初始化。    /// </summary>
     public async Task<SeedExecutionResult> SeedAsync(CancellationToken cancellationToken = default)
     {
         var inserted = 0;
@@ -28,7 +26,7 @@ public class IdentityRoleSeeder : IDataSeeder
         var role = await _dbContext.Roles.FirstOrDefaultAsync(x => x.Code == IdentitySeedData.SuperAdminRoleCode, cancellationToken);
         if (role is null)
         {
-            role = new RoleModel
+            role = new Role
             {
                 Id = IdentitySeedData.SuperAdminRoleId,
                 Code = IdentitySeedData.SuperAdminRoleCode,
@@ -59,7 +57,7 @@ public class IdentityRoleSeeder : IDataSeeder
                 continue;
             }
 
-            _dbContext.RolePermissions.Add(new RolePermissionModel
+            _dbContext.RolePermissions.Add(new RolePermission
             {
                 RoleId = role.Id,
                 PermissionId = permissionId

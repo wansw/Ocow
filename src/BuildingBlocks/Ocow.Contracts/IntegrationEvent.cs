@@ -1,8 +1,7 @@
-namespace Ocow.Contracts;
+﻿namespace Ocow.Contracts;
 
 /// <summary>
-/// 集成事件基类，用于跨服务 RabbitMQ 消息契约。
-/// </summary>
+/// 集成事件基类，用于跨服务 RabbitMQ 消息契约。/// </summary>
 public abstract class IntegrationEvent
 {
     public Guid EventId { get; init; } = Guid.NewGuid();

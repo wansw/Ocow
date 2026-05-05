@@ -1,13 +1,12 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocow.Order.Domain.Models;
 
 /// <summary>
-/// 订单明细领域模型，用于记录商品快照和购买数量。
-/// </summary>
+/// 订单明细领域模型，用于记录商品快照和购买数量。/// </summary>
 [Table("order_items")]
-public class OrderItemModel
+public class OrderItem
 {
     [Key]
     public Guid Id { get; set; }
@@ -28,9 +27,8 @@ public class OrderItemModel
     public decimal UnitPrice { get; set; }
 
     /// <summary>
-    /// 所属订单，用于表达订单明细到订单的外键关系。
-    /// </summary>
+    /// 所属订单，用于表达订单明细到订单的外键关系。    /// </summary>
     [ForeignKey(nameof(OrderId))]
-    [InverseProperty(nameof(OrderModel.Items))]
-    public OrderModel? Order { get; set; }
+    [InverseProperty(nameof(Order.Items))]
+    public Order? Order { get; set; }
 }

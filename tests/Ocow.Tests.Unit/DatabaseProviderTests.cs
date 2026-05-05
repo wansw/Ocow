@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Ocow.EntityFrameworkCore.Extensions;
 using Ocow.EntityFrameworkCore.Options;
@@ -6,13 +6,11 @@ using Ocow.EntityFrameworkCore.Options;
 namespace Ocow.Tests.Unit;
 
 /// <summary>
-/// 数据库 Provider 单元测试，用于验证公共 EF Core 配置入口。
-/// </summary>
+/// 数据库 Provider 单元测试，用于验证公共 EF Core 配置入口。/// </summary>
 public class DatabaseProviderTests
 {
     /// <summary>
-    /// 验证 PostgreSQL Provider 可以通过统一扩展写入 DbContext 配置。
-    /// </summary>
+    /// 验证 PostgreSQL Provider 可以通过统一扩展写入 DbContext 配置。    /// </summary>
     [Fact]
     public void UseOcowDatabase_WhenPostgreSql_ShouldConfigureProvider()
     {
@@ -30,8 +28,7 @@ public class DatabaseProviderTests
     }
 
     /// <summary>
-    /// 验证空连接字符串会被拒绝。
-    /// </summary>
+    /// 验证空连接字符串会被拒绝。    /// </summary>
     [Fact]
     public void UseOcowDatabase_WhenConnectionStringEmpty_ShouldThrow()
     {

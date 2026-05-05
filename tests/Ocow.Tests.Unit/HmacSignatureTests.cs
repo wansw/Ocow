@@ -1,17 +1,15 @@
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Ocow.InternalAuth.Options;
 using Ocow.InternalAuth.Services;
 
 namespace Ocow.Tests.Unit;
 
 /// <summary>
-/// HMAC 签名单元测试，用于验证内部服务签名生成和校验。
-/// </summary>
+/// HMAC 签名单元测试，用于验证内部服务签名生成和校验。/// </summary>
 public class HmacSignatureTests
 {
     /// <summary>
-    /// 验证同一请求信息生成的签名可以通过校验。
-    /// </summary>
+    /// 验证同一请求信息生成的签名可以通过校验。    /// </summary>
     [Fact]
     public void Validate_WhenSignatureMatches_ShouldReturnTrue()
     {
@@ -29,8 +27,7 @@ public class HmacSignatureTests
     }
 
     /// <summary>
-    /// 验证请求路径被篡改时签名校验失败。
-    /// </summary>
+    /// 验证请求路径被篡改时签名校验失败。    /// </summary>
     [Fact]
     public void Validate_WhenPathChanged_ShouldReturnFalse()
     {

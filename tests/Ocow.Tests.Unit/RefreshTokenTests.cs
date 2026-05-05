@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Ocow.Identity.Application.Dtos;
 using Ocow.Identity.Application.Interfaces;
 using Ocow.Identity.Application.Options;
@@ -9,18 +9,16 @@ using Ocow.Shared.Dtos;
 namespace Ocow.Tests.Unit;
 
 /// <summary>
-/// 刷新 Token 单元测试，用于验证刷新时会轮换并吊销旧 Token。
-/// </summary>
+/// 刷新 Token 单元测试，用于验证刷新时会轮换并吊销。Token。/// </summary>
 public class RefreshTokenTests
 {
     /// <summary>
-    /// 验证管理员刷新 Token 会吊销旧 Token 并保存新 Token。
-    /// </summary>
+    /// 验证管理员刷。Token 会吊销。Token 并保存新 Token。    /// </summary>
     [Fact]
     public async Task RefreshToken_WhenAdminTokenValid_ShouldRotateRefreshToken()
     {
         var repository = new FakeIdentityRepository();
-        var oldToken = new RefreshTokenModel
+        var oldToken = new RefreshToken
         {
             Id = Guid.NewGuid(),
             SubjectId = Guid.NewGuid(),
@@ -45,13 +43,13 @@ public class RefreshTokenTests
 
     private class FakeIdentityRepository : IIdentityRepository
     {
-        public List<RefreshTokenModel> RefreshTokens { get; } = new();
+        public List<RefreshToken> RefreshTokens { get; } = new();
 
         public List<string> PermissionCodes { get; } = new();
 
-        public Task<AdminUserModel?> GetAdminUserByNameAsync(string userName, CancellationToken cancellationToken = default)
+        public Task<AdminUser?> GetAdminUserByNameAsync(string userName, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult<AdminUserModel?>(null);
+            return Task.FromResult<AdminUser?>(null);
         }
 
         public Task<IReadOnlyList<string>> GetAdminPermissionCodesAsync(Guid adminUserId, CancellationToken cancellationToken = default)
@@ -59,12 +57,12 @@ public class RefreshTokenTests
             return Task.FromResult<IReadOnlyList<string>>(PermissionCodes);
         }
 
-        public Task<PageResDto<AdminUserModel>> GetAdminUsersAsync(PageReqDto reqDto, CancellationToken cancellationToken = default)
+        public Task<PageResDto<AdminUser>> GetAdminUsersAsync(PageReqDto reqDto, CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
         }
 
-        public Task AddAdminUserAsync(AdminUserModel adminUser, IReadOnlyCollection<Guid> roleIds, CancellationToken cancellationToken = default)
+        public Task AddAdminUserAsync(AdminUser adminUser, IReadOnlyCollection<Guid> roleIds, CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
         }
@@ -74,17 +72,17 @@ public class RefreshTokenTests
             throw new NotSupportedException();
         }
 
-        public Task<IReadOnlyList<RoleModel>> GetRolesAsync(CancellationToken cancellationToken = default)
+        public Task<IReadOnlyList<Role>> GetRolesAsync(CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
         }
 
-        public Task<RoleModel> SaveRoleAsync(RoleModel role, CancellationToken cancellationToken = default)
+        public Task<Role> SaveRoleAsync(Role role, CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
         }
 
-        public Task<IReadOnlyList<PermissionModel>> GetPermissionsAsync(CancellationToken cancellationToken = default)
+        public Task<IReadOnlyList<Permission>> GetPermissionsAsync(CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
         }
@@ -94,23 +92,23 @@ public class RefreshTokenTests
             throw new NotSupportedException();
         }
 
-        public Task<MemberIdentityModel?> GetMemberIdentityByOpenIdAsync(string openId, CancellationToken cancellationToken = default)
+        public Task<MemberIdentity?> GetMemberIdentityByOpenIdAsync(string openId, CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
         }
 
-        public Task SaveMemberIdentityAsync(MemberIdentityModel memberIdentity, CancellationToken cancellationToken = default)
+        public Task SaveMemberIdentityAsync(MemberIdentity memberIdentity, CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
         }
 
-        public Task SaveRefreshTokenAsync(RefreshTokenModel refreshToken, CancellationToken cancellationToken = default)
+        public Task SaveRefreshTokenAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default)
         {
             RefreshTokens.Add(refreshToken);
             return Task.CompletedTask;
         }
 
-        public Task<RefreshTokenModel?> GetRefreshTokenAsync(string token, string scope, CancellationToken cancellationToken = default)
+        public Task<RefreshToken?> GetRefreshTokenAsync(string token, string scope, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(RefreshTokens.FirstOrDefault(x =>
                 x.Token == token &&
@@ -130,7 +128,7 @@ public class RefreshTokenTests
             return Task.CompletedTask;
         }
 
-        public Task AddLoginLogAsync(LoginLogModel loginLog, CancellationToken cancellationToken = default)
+        public Task AddLoginLogAsync(LoginLog loginLog, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }

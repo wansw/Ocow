@@ -58,7 +58,7 @@ public class IdentityAdminUserSeeder : IDataSeeder
         var adminUser = await _dbContext.AdminUsers.FirstOrDefaultAsync(x => x.UserName == userName, cancellationToken);
         if (adminUser is null)
         {
-            adminUser = new AdminUserModel
+            adminUser = new AdminUser
             {
                 Id = IdentitySeedData.SuperAdminUserId,
                 UserName = userName,
@@ -111,7 +111,7 @@ public class IdentityAdminUserSeeder : IDataSeeder
 
         if (!hasRoleBinding)
         {
-            _dbContext.AdminUserRoles.Add(new AdminUserRoleModel
+            _dbContext.AdminUserRoles.Add(new AdminUserRole
             {
                 AdminUserId = adminUser.Id,
                 RoleId = roleId

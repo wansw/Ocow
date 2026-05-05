@@ -1,4 +1,4 @@
-using Ocow.Identity.Application.Dtos;
+﻿using Ocow.Identity.Application.Dtos;
 using Ocow.Identity.Application.Interfaces;
 using Ocow.Identity.Domain.Enums;
 using Ocow.Identity.Domain.Models;
@@ -6,16 +6,14 @@ using Ocow.Identity.Domain.Models;
 namespace Ocow.Identity.Application.Services;
 
 /// <summary>
-/// 后台认证应用服务，用于管理员登录和 Token 签发。
-/// </summary>
+/// 后台认证应用服务，用于管理员登录。Token 签发。/// </summary>
 public class AdminAuthAppService : IAdminAuthAppService
 {
     private readonly IIdentityRepository _repository;
     private readonly ITokenService _tokenService;
 
     /// <summary>
-    /// 创建后台认证应用服务。
-    /// </summary>
+    /// 创建后台认证应用服务。    /// </summary>
     public AdminAuthAppService(IIdentityRepository repository, ITokenService tokenService)
     {
         _repository = repository;
@@ -23,8 +21,7 @@ public class AdminAuthAppService : IAdminAuthAppService
     }
 
     /// <summary>
-    /// 后台管理员登录并签发 Admin JWT。
-    /// </summary>
+    /// 后台管理员登录并签发 Admin JWT。    /// </summary>
     public async Task<AuthTokenResDto> LoginAsync(AdminLoginReqDto reqDto, CancellationToken cancellationToken = default)
     {
         var adminUser = await _repository.GetAdminUserByNameAsync(reqDto.UserName, cancellationToken);
@@ -32,7 +29,7 @@ public class AdminAuthAppService : IAdminAuthAppService
                       adminUser.Status == AdminUserStatusEnum.Enabled &&
                       PasswordHashService.Verify(reqDto.Password, adminUser.PasswordHash);
 
-        await _repository.AddLoginLogAsync(new LoginLogModel
+        await _repository.AddLoginLogAsync(new LoginLog
         {
             Id = Guid.NewGuid(),
             LoginName = reqDto.UserName,
@@ -54,8 +51,7 @@ public class AdminAuthAppService : IAdminAuthAppService
     }
 
     /// <summary>
-    /// 刷新后台管理员 Token。
-    /// </summary>
+    /// 刷新后台管理。Token。    /// </summary>
     public async Task<AuthTokenResDto> RefreshTokenAsync(RefreshTokenReqDto reqDto, CancellationToken cancellationToken = default)
     {
         var oldRefreshToken = await _repository.GetRefreshTokenAsync(reqDto.RefreshToken, "admin", cancellationToken) ??
@@ -71,19 +67,17 @@ public class AdminAuthAppService : IAdminAuthAppService
     }
 
     /// <summary>
-    /// 退出后台登录。
-    /// </summary>
+    /// 退出后台登录。    /// </summary>
     public async Task LogoutAsync(RefreshTokenReqDto reqDto, CancellationToken cancellationToken = default)
     {
         await _repository.RevokeRefreshTokenAsync(reqDto.RefreshToken, "admin", cancellationToken);
     }
 
     /// <summary>
-    /// 创建刷新 Token 实体。
-    /// </summary>
-    private static RefreshTokenModel CreateRefreshToken(Guid subjectId, string scope, string token)
+    /// 创建刷新 Token 实体。    /// </summary>
+    private static RefreshToken CreateRefreshToken(Guid subjectId, string scope, string token)
     {
-        return new RefreshTokenModel
+        return new RefreshToken
         {
             Id = Guid.NewGuid(),
             SubjectId = subjectId,

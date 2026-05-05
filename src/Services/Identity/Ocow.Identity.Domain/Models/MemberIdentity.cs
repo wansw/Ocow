@@ -1,13 +1,12 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocow.Identity.Domain.Models;
 
 /// <summary>
-/// 会员身份实体，用于保存小程序 openid 与会员编号的绑定关系。
-/// </summary>
+/// 会员身份实体，用于保存小程序 openid 与会员编号的绑定关系。/// </summary>
 [Table("member_identities")]
-public class MemberIdentityModel
+public class MemberIdentity
 {
     [Key]
     public Guid Id { get; set; }

@@ -1,14 +1,13 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Ocow.Identity.Domain.Enums;
 
 namespace Ocow.Identity.Domain.Models;
 
 /// <summary>
-/// 后台管理员实体，用于保存管理员账号和密码摘要。
-/// </summary>
+/// 后台管理员实体，用于保存管理员账号和密码摘要。/// </summary>
 [Table("admin_users")]
-public class AdminUserModel
+public class AdminUser
 {
     [Key]
     public Guid Id { get; set; }
@@ -30,8 +29,7 @@ public class AdminUserModel
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     /// <summary>
-    /// 管理员角色绑定集合，用于表达管理员与角色的多对多关系。
-    /// </summary>
-    [InverseProperty(nameof(AdminUserRoleModel.AdminUser))]
-    public List<AdminUserRoleModel> AdminUserRoles { get; set; } = new();
+    /// 管理员角色绑定集合，用于表达管理员与角色的多对多关系。    /// </summary>
+    [InverseProperty(nameof(AdminUserRole.AdminUser))]
+    public List<AdminUserRole> AdminUserRoles { get; set; } = new();
 }

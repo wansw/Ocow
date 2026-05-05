@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
@@ -11,8 +11,7 @@ using Ocow.InternalAuth.Services;
 namespace Ocow.InternalAuth.Extensions;
 
 /// <summary>
-/// 内部服务认证注册扩展。
-/// </summary>
+/// 内部服务认证注册扩展。/// </summary>
 public static class InternalAuthServiceCollectionExtensions
 {
     public const string CustomerJwtScheme = "CustomerJwt";
@@ -24,8 +23,7 @@ public static class InternalAuthServiceCollectionExtensions
     public const string OrderShipPolicy = "order.ship";
 
     /// <summary>
-    /// 注册 Service JWT 验证策略。
-    /// </summary>
+    /// 注册 Service JWT 验证策略。    /// </summary>
     public static IServiceCollection AddOcowInternalAuth(this IServiceCollection services, IConfiguration configuration)
     {
         var option = configuration.GetSection("InternalAuth").Get<InternalAuthOption>() ?? new InternalAuthOption();
@@ -50,8 +48,7 @@ public static class InternalAuthServiceCollectionExtensions
     }
 
     /// <summary>
-    /// 注册 Customer、Admin、Service 三类 JWT 校验策略和权限策略。
-    /// </summary>
+    /// 注册 Customer、Admin、Service 三类 JWT 校验策略和权限策略。    /// </summary>
     public static IServiceCollection AddOcowJwtAuthorization(this IServiceCollection services, IConfiguration configuration)
     {
         var identityOption = configuration.GetSection("Jwt").Get<IdentityJwtOption>() ?? new IdentityJwtOption();
@@ -87,8 +84,7 @@ public static class InternalAuthServiceCollectionExtensions
     }
 
     /// <summary>
-    /// 配置 JWT Bearer 校验参数。
-    /// </summary>
+    /// 配置 JWT Bearer 校验参数。    /// </summary>
     private static void ConfigureJwt(JwtBearerOptions options, string issuer, string audience, string secret)
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -104,8 +100,7 @@ public static class InternalAuthServiceCollectionExtensions
     }
 
     /// <summary>
-    /// 配置指定认证方案和 scope 要求。
-    /// </summary>
+    /// 配置指定认证方案。scope 要求。    /// </summary>
     private static void RequireScope(AuthorizationPolicyBuilder policy, string scheme, string scope)
     {
         policy.AuthenticationSchemes.Add(scheme);

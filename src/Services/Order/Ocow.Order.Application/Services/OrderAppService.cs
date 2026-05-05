@@ -2,6 +2,7 @@ using Ocow.Order.Application.Dtos;
 using Ocow.Order.Application.Interfaces;
 using Ocow.Order.Domain.Models;
 using Ocow.Shared.Dtos;
+using OrderEntity = Ocow.Order.Domain.Models.Order;
 
 namespace Ocow.Order.Application.Services;
 
@@ -35,7 +36,7 @@ public class OrderAppService : IOrderAppService
             throw new ArgumentException("订单商品不能为空。", nameof(reqDto));
         }
 
-        var items = reqDto.Items.Select(item => new OrderItemModel
+        var items = reqDto.Items.Select(item => new OrderItem
         {
             Id = Guid.NewGuid(),
             ProductId = item.ProductId,
@@ -45,7 +46,7 @@ public class OrderAppService : IOrderAppService
             UnitPrice = item.UnitPrice
         });
 
-        var order = OrderModel.Create(reqDto.CustomerId, items);
+        var order = OrderEntity.Create(reqDto.CustomerId, items);
         foreach (var item in order.Items)
         {
             item.OrderId = order.Id;
@@ -139,9 +140,9 @@ public class OrderAppService : IOrderAppService
     }
 
     /// <summary>
-    /// 将领域模型转换为响应 DTO。
+    /// 将领域实体转换为响应 DTO。
     /// </summary>
-    private static OrderResDto MapToResDto(OrderModel order)
+    private static OrderResDto MapToResDto(OrderEntity order)
     {
         return new OrderResDto
         {

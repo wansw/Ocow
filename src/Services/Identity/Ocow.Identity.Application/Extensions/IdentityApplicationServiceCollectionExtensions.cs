@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ocow.Identity.Application.Interfaces;
 using Ocow.Identity.Application.Options;
@@ -7,13 +7,11 @@ using Ocow.Identity.Application.Services;
 namespace Ocow.Identity.Application.Extensions;
 
 /// <summary>
-/// 身份认证应用层服务注册扩展。
-/// </summary>
+/// 身份认证应用层服务注册扩展。/// </summary>
 public static class IdentityApplicationServiceCollectionExtensions
 {
     /// <summary>
-    /// 注册身份认证应用服务和 Token 服务。
-    /// </summary>
+    /// 注册身份认证应用服务。Token 服务。    /// </summary>
     public static IServiceCollection AddIdentityApplication(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<JwtTokenOption>(configuration.GetSection("Jwt"));

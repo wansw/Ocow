@@ -1,13 +1,12 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocow.Identity.Domain.Models;
 
 /// <summary>
-/// 登录日志实体，用于记录管理员和会员登录结果。
-/// </summary>
+/// 登录日志实体，用于记录管理员和会员登录结果。/// </summary>
 [Table("login_logs")]
-public class LoginLogModel
+public class LoginLog
 {
     [Key]
     public Guid Id { get; set; }

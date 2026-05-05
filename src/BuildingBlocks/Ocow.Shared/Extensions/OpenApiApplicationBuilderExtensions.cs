@@ -23,8 +23,8 @@ public static class OpenApiApplicationBuilderExtensions
         app.UseSwagger();
         app.UseSwaggerUI(options =>
         {
-            options.SwaggerEndpoint($"/swagger/{OpenApiGroupNames.Client}/swagger.json", "Client 小程序/用户端接口");
-            options.SwaggerEndpoint($"/swagger/{OpenApiGroupNames.Admin}/swagger.json", "Admin PC后台接口");
+            options.SwaggerEndpoint($"/swagger/{OpenApiGroupNames.Client}/swagger.json", "Client 小程序用户端接口");
+            options.SwaggerEndpoint($"/swagger/{OpenApiGroupNames.Admin}/swagger.json", "Admin PC 后台接口");
             options.SwaggerEndpoint($"/swagger/{OpenApiGroupNames.Internal}/swagger.json", "Internal 内部服务接口");
             options.SwaggerEndpoint($"/swagger/{OpenApiGroupNames.Notify}/swagger.json", "Notify 第三方回调接口");
             options.RoutePrefix = "swagger";

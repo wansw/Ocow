@@ -1,17 +1,15 @@
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Ocow.Identity.Application.Options;
 using Ocow.Identity.Application.Services;
 
 namespace Ocow.Tests.Unit;
 
 /// <summary>
-/// 身份认证单元测试，用于验证密码摘要和 Token 签发规则。
-/// </summary>
+/// 身份认证单元测试，用于验证密码摘要和 Token 签发规则。/// </summary>
 public class IdentityTokenTests
 {
     /// <summary>
-    /// 验证密码摘要可以正确校验明文密码。
-    /// </summary>
+    /// 验证密码摘要可以正确校验明文密码。    /// </summary>
     [Fact]
     public void Verify_WhenPasswordMatches_ShouldReturnTrue()
     {
@@ -23,8 +21,7 @@ public class IdentityTokenTests
     }
 
     /// <summary>
-    /// 验证签发 Admin Token 时会带上权限点。
-    /// </summary>
+    /// 验证签发 Admin Token 时会带上权限点。    /// </summary>
     [Fact]
     public void IssueToken_WhenAdmin_ShouldReturnPermissions()
     {

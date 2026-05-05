@@ -1,8 +1,7 @@
-namespace Ocow.InternalAuth.Options;
+﻿namespace Ocow.InternalAuth.Options;
 
 /// <summary>
-/// Identity JWT 验证配置，用于校验 Customer JWT 和 Admin JWT。
-/// </summary>
+/// Identity JWT 验证配置，用于校。Customer JWT 。Admin JWT。/// </summary>
 public class IdentityJwtOption
 {
     public string Issuer { get; init; } = "Ocow.Identity";

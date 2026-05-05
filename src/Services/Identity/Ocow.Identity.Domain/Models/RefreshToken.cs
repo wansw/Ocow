@@ -1,13 +1,12 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocow.Identity.Domain.Models;
 
 /// <summary>
-/// 刷新 Token 实体，用于支持访问 Token 续签和退出登录。
-/// </summary>
+/// 刷新 Token 实体，用于支持访。Token 续签和退出登录。/// </summary>
 [Table("refresh_tokens")]
-public class RefreshTokenModel
+public class RefreshToken
 {
     [Key]
     public Guid Id { get; set; }

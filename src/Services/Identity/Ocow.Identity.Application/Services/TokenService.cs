@@ -1,4 +1,4 @@
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -11,23 +11,20 @@ using Ocow.Identity.Application.Options;
 namespace Ocow.Identity.Application.Services;
 
 /// <summary>
-/// Token 服务实现，用于签发 Customer JWT 和 Admin JWT。
-/// </summary>
+/// Token 服务实现，用于签。Customer JWT 。Admin JWT。/// </summary>
 public class TokenService : ITokenService
 {
     private readonly JwtTokenOption _option;
 
     /// <summary>
-    /// 创建 Token 服务。
-    /// </summary>
+    /// 创建 Token 服务。    /// </summary>
     public TokenService(IOptions<JwtTokenOption> option)
     {
         _option = option.Value;
     }
 
     /// <summary>
-    /// 签发登录 Token。
-    /// </summary>
+    /// 签发登录 Token。    /// </summary>
     public AuthTokenResDto IssueToken(Guid subjectId, string scope, IEnumerable<string> permissions, IEnumerable<Claim>? extraClaims = null)
     {
         var permissionList = permissions.Distinct().ToList();

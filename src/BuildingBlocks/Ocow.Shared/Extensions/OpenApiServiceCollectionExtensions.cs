@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Ocow.Shared.OpenApi;
@@ -7,8 +7,7 @@ using Ocow.Shared.Options;
 namespace Ocow.Shared.Extensions;
 
 /// <summary>
-/// OpenAPI 服务注册扩展。
-/// </summary>
+/// OpenAPI 服务注册扩展。/// </summary>
 public static class OpenApiServiceCollectionExtensions
 {
     private static readonly string[] GroupNames =
@@ -20,8 +19,7 @@ public static class OpenApiServiceCollectionExtensions
     };
 
     /// <summary>
-    /// 注册 Ocow 统一 Swagger / OpenAPI 配置。
-    /// </summary>
+    /// 注册 Ocow 统一 Swagger / OpenAPI 配置。    /// </summary>
     public static IServiceCollection AddOcowOpenApi(this IServiceCollection services, IConfiguration configuration)
     {
         var option = configuration.GetSection("OpenApi").Get<OpenApiOption>() ?? new OpenApiOption();
@@ -81,8 +79,7 @@ public static class OpenApiServiceCollectionExtensions
     }
 
     /// <summary>
-    /// 根据接口路径解析 OpenAPI 分组。
-    /// </summary>
+    /// 根据接口路径解析 OpenAPI 分组。    /// </summary>
     private static string ResolveGroupName(string relativePath)
     {
         var path = relativePath.TrimStart('/').ToLowerInvariant();

@@ -1,27 +1,24 @@
-using Ocow.Identity.Application.Dtos;
+﻿using Ocow.Identity.Application.Dtos;
 using Ocow.Identity.Application.Interfaces;
 using Ocow.Identity.Domain.Models;
 
 namespace Ocow.Identity.Application.Services;
 
 /// <summary>
-/// 角色权限应用服务，用于管理 RBAC 角色和权限点。
-/// </summary>
+/// 角色权限应用服务，用于管。RBAC 角色和权限点。/// </summary>
 public class RolePermissionAppService : IRolePermissionAppService
 {
     private readonly IIdentityRepository _repository;
 
     /// <summary>
-    /// 创建角色权限应用服务。
-    /// </summary>
+    /// 创建角色权限应用服务。    /// </summary>
     public RolePermissionAppService(IIdentityRepository repository)
     {
         _repository = repository;
     }
 
     /// <summary>
-    /// 查询角色列表。
-    /// </summary>
+    /// 查询角色列表。    /// </summary>
     public async Task<IReadOnlyList<RoleResDto>> GetRolesAsync(CancellationToken cancellationToken = default)
     {
         var roles = await _repository.GetRolesAsync(cancellationToken);
@@ -29,11 +26,10 @@ public class RolePermissionAppService : IRolePermissionAppService
     }
 
     /// <summary>
-    /// 保存角色。
-    /// </summary>
+    /// 保存角色。    /// </summary>
     public async Task<RoleResDto> SaveRoleAsync(Guid? id, RoleReqDto reqDto, CancellationToken cancellationToken = default)
     {
-        var role = new RoleModel
+        var role = new Role
         {
             Id = id ?? Guid.NewGuid(),
             Code = reqDto.Code,
@@ -45,8 +41,7 @@ public class RolePermissionAppService : IRolePermissionAppService
     }
 
     /// <summary>
-    /// 查询权限点列表。
-    /// </summary>
+    /// 查询权限点列表。    /// </summary>
     public async Task<IReadOnlyList<PermissionResDto>> GetPermissionsAsync(CancellationToken cancellationToken = default)
     {
         var permissions = await _repository.GetPermissionsAsync(cancellationToken);
@@ -60,17 +55,15 @@ public class RolePermissionAppService : IRolePermissionAppService
     }
 
     /// <summary>
-    /// 绑定角色权限点。
-    /// </summary>
+    /// 绑定角色权限点。    /// </summary>
     public async Task BindRolePermissionsAsync(Guid roleId, BindRolePermissionsReqDto reqDto, CancellationToken cancellationToken = default)
     {
         await _repository.BindRolePermissionsAsync(roleId, reqDto.PermissionIds, cancellationToken);
     }
 
     /// <summary>
-    /// 将角色实体转换为响应 DTO。
-    /// </summary>
-    private static RoleResDto MapRoleToResDto(RoleModel role)
+    /// 将角色实体转换为响应 DTO。    /// </summary>
+    private static RoleResDto MapRoleToResDto(Role role)
     {
         return new RoleResDto
         {

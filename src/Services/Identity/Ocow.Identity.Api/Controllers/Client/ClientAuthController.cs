@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Ocow.Identity.Application.Dtos;
 using Ocow.Identity.Application.Interfaces;
 using Ocow.Shared.Dtos;
@@ -6,8 +6,7 @@ using Ocow.Shared.Dtos;
 namespace Ocow.Identity.Api.Controllers.Client;
 
 /// <summary>
-/// 小程序认证接口，用于微信登录、刷新 Token 和退出登录。
-/// </summary>
+/// 小程序认证接口，用于微信登录、刷。Token 和退出登录。/// </summary>
 [ApiController]
 [Route("api/auth")]
 public class ClientAuthController : ControllerBase
@@ -15,16 +14,14 @@ public class ClientAuthController : ControllerBase
     private readonly IClientAuthAppService _clientAuthAppService;
 
     /// <summary>
-    /// 创建小程序认证 Controller。
-    /// </summary>
+    /// 创建小程序认。Controller。    /// </summary>
     public ClientAuthController(IClientAuthAppService clientAuthAppService)
     {
         _clientAuthAppService = clientAuthAppService;
     }
 
     /// <summary>
-    /// 小程序微信登录并签发 Customer JWT。
-    /// </summary>
+    /// 小程序微信登录并签发 Customer JWT。    /// </summary>
     [HttpPost("wechat-login")]
     public async Task<ActionResult<ApiResDto<AuthTokenResDto>>> WechatLoginAsync([FromBody] WechatLoginReqDto reqDto, CancellationToken cancellationToken)
     {
@@ -33,8 +30,7 @@ public class ClientAuthController : ControllerBase
     }
 
     /// <summary>
-    /// 刷新小程序 Token。
-    /// </summary>
+    /// 刷新小程。Token。    /// </summary>
     [HttpPost("refresh-token")]
     public async Task<ActionResult<ApiResDto<AuthTokenResDto>>> RefreshTokenAsync([FromBody] RefreshTokenReqDto reqDto, CancellationToken cancellationToken)
     {
@@ -43,8 +39,7 @@ public class ClientAuthController : ControllerBase
     }
 
     /// <summary>
-    /// 小程序退出登录。
-    /// </summary>
+    /// 小程序退出登录。    /// </summary>
     [HttpPost("logout")]
     public async Task<ActionResult<ApiResDto<bool>>> LogoutAsync([FromBody] RefreshTokenReqDto reqDto, CancellationToken cancellationToken)
     {

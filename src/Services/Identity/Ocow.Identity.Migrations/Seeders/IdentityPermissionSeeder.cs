@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Ocow.EntityFrameworkCore.Seeders;
 using Ocow.Identity.Domain.Models;
 using Ocow.Identity.Infrastructure.Data;
@@ -6,8 +6,7 @@ using Ocow.Identity.Infrastructure.Data;
 namespace Ocow.Identity.Migrations.Seeders;
 
 /// <summary>
-/// 身份服务权限点播种器，用于幂等初始化后台权限点。
-/// </summary>
+/// 身份服务权限点播种器，用于幂等初始化后台权限点。/// </summary>
 public class IdentityPermissionSeeder : IDataSeeder
 {
     private readonly IdentityDbContext _dbContext;
@@ -18,8 +17,7 @@ public class IdentityPermissionSeeder : IDataSeeder
     }
 
     /// <summary>
-    /// 执行权限点种子数据初始化。
-    /// </summary>
+    /// 执行权限点种子数据初始化。    /// </summary>
     public async Task<SeedExecutionResult> SeedAsync(CancellationToken cancellationToken = default)
     {
         var codes = IdentitySeedData.Permissions.Select(x => x.Code).ToArray();
@@ -35,7 +33,7 @@ public class IdentityPermissionSeeder : IDataSeeder
             var existing = existingPermissions.FirstOrDefault(x => x.Code == permission.Code);
             if (existing is null)
             {
-                _dbContext.Permissions.Add(new PermissionModel
+                _dbContext.Permissions.Add(new Permission
                 {
                     Id = permission.Id,
                     Code = permission.Code,

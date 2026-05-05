@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ocow.EntityFrameworkCore.Extensions;
@@ -10,13 +10,11 @@ using Ocow.Order.Infrastructure.Repositories;
 namespace Ocow.Order.Infrastructure.Extensions;
 
 /// <summary>
-/// 订单基础设施层服务注册扩展。
-/// </summary>
+/// 订单基础设施层服务注册扩展。/// </summary>
 public static class OrderInfrastructureServiceCollectionExtensions
 {
     /// <summary>
-    /// 注册订单数据库上下文和仓储实现。
-    /// </summary>
+    /// 注册订单数据库上下文和仓储实现。    /// </summary>
     public static IServiceCollection AddOrderInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         var option = configuration.GetSection("Database").Get<DatabaseOption>() ?? new DatabaseOption();
