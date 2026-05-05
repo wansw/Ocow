@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Ocow.InternalAuth.Extensions;
 using Ocow.Identity.Application.Dtos;
+using Ocow.Shared.Controllers;
 using Ocow.Shared.Dtos;
 
 namespace Ocow.Identity.Api.Controllers.Client;
@@ -11,12 +12,12 @@ namespace Ocow.Identity.Api.Controllers.Client;
 [ApiController]
 [Route("api/auth")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.CustomerOnlyPolicy)]
-public class ClientProfileController : ControllerBase
+public class ClientProfileController : BaseController
 {
     /// <summary>
     /// 查询当前小程序用户身份。    /// </summary>
     [HttpGet("me")]
-    public ActionResult<ApiResDto<ClientProfileResDto>> GetMe()
+    public ApiResDto<ClientProfileResDto> GetMe()
     {
         var memberId = User.FindFirst("memberId")?.Value;
         var openId = User.FindFirst("openid")?.Value ?? string.Empty;
@@ -27,6 +28,6 @@ public class ClientProfileController : ControllerBase
             OpenId = openId
         };
 
-        return ApiResDto<ClientProfileResDto>.Ok(result, HttpContext.TraceIdentifier);
+        return Success(result);
     }
 }

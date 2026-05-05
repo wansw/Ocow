@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ocow.InternalAuth.Extensions;
 using Ocow.Order.Application.Dtos;
 using Ocow.Order.Application.Interfaces;
+using Ocow.Shared.Controllers;
 using Ocow.Shared.Dtos;
 
 namespace Ocow.Order.Api.Controllers.Admin;
@@ -13,7 +14,7 @@ namespace Ocow.Order.Api.Controllers.Admin;
 [ApiController]
 [Route("api/admin/orders")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.AdminOnlyPolicy)]
-public class AdminOrdersController : ControllerBase
+public class AdminOrdersController : BaseController
 {
     private readonly IOrderAppService _orderAppService;
 
@@ -29,10 +30,10 @@ public class AdminOrdersController : ControllerBase
     /// 查询后台订单列表。
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<ApiResDto<PageResDto<OrderResDto>>>> GetListAsync([FromQuery] PageReqDto reqDto, CancellationToken cancellationToken)
+    public async Task<ApiResDto<PageResDto<OrderResDto>>> GetListAsync([FromQuery] PageReqDto reqDto, CancellationToken cancellationToken)
     {
         var result = await _orderAppService.GetAdminOrdersAsync(reqDto, cancellationToken);
-        return ApiResDto<PageResDto<OrderResDto>>.Ok(result, HttpContext.TraceIdentifier);
+        return Success(result);
     }
 
     /// <summary>
@@ -44,10 +45,10 @@ public class AdminOrdersController : ControllerBase
         var result = await _orderAppService.GetByIdAsync(id, cancellationToken);
         if (result is null)
         {
-            return NotFound(ApiResDto<OrderResDto>.Fail("ORDER_NOT_FOUND", "订单不存在。", HttpContext.TraceIdentifier));
+            return NotFoundRes<OrderResDto>("ORDER_NOT_FOUND", "订单不存在。");
         }
 
-        return ApiResDto<OrderResDto>.Ok(result, HttpContext.TraceIdentifier);
+        return Success(result);
     }
 
     /// <summary>
@@ -55,9 +56,9 @@ public class AdminOrdersController : ControllerBase
     /// </summary>
     [Authorize(Policy = InternalAuthServiceCollectionExtensions.OrderShipPolicy)]
     [HttpPut("{id:guid}/ship")]
-    public async Task<ActionResult<ApiResDto<OrderResDto>>> ShipAsync(Guid id, [FromBody] ShipOrderReqDto reqDto, CancellationToken cancellationToken)
+    public async Task<ApiResDto<OrderResDto>> ShipAsync(Guid id, [FromBody] ShipOrderReqDto reqDto, CancellationToken cancellationToken)
     {
         var result = await _orderAppService.ShipAsync(id, reqDto, cancellationToken);
-        return ApiResDto<OrderResDto>.Ok(result, HttpContext.TraceIdentifier);
+        return Success(result);
     }
 }

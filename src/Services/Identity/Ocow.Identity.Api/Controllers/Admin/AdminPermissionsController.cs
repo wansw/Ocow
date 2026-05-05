@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ocow.InternalAuth.Extensions;
 using Ocow.Identity.Application.Dtos;
 using Ocow.Identity.Application.Interfaces;
+using Ocow.Shared.Controllers;
 using Ocow.Shared.Dtos;
 
 namespace Ocow.Identity.Api.Controllers.Admin;
@@ -12,7 +13,7 @@ namespace Ocow.Identity.Api.Controllers.Admin;
 [ApiController]
 [Route("api/admin/permissions")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.AdminOnlyPolicy)]
-public class AdminPermissionsController : ControllerBase
+public class AdminPermissionsController : BaseController
 {
     private readonly IRolePermissionAppService _rolePermissionAppService;
 
@@ -26,9 +27,9 @@ public class AdminPermissionsController : ControllerBase
     /// <summary>
     /// 查询权限点列表。    /// </summary>
     [HttpGet]
-    public async Task<ActionResult<ApiResDto<IReadOnlyList<PermissionResDto>>>> GetListAsync(CancellationToken cancellationToken)
+    public async Task<ApiResDto<IReadOnlyList<PermissionResDto>>> GetListAsync(CancellationToken cancellationToken)
     {
         var result = await _rolePermissionAppService.GetPermissionsAsync(cancellationToken);
-        return ApiResDto<IReadOnlyList<PermissionResDto>>.Ok(result, HttpContext.TraceIdentifier);
+        return Success(result);
     }
 }

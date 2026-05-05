@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ocow.InternalAuth.Extensions;
 using Ocow.Order.Application.Dtos;
 using Ocow.Order.Application.Interfaces;
+using Ocow.Shared.Controllers;
 using Ocow.Shared.Dtos;
 
 namespace Ocow.Order.Api.Controllers.Client;
@@ -13,7 +14,7 @@ namespace Ocow.Order.Api.Controllers.Client;
 [ApiController]
 [Route("api/orders")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.CustomerOnlyPolicy)]
-public class OrdersController : ControllerBase
+public class OrdersController : BaseController
 {
     private readonly IOrderAppService _orderAppService;
 
@@ -29,20 +30,20 @@ public class OrdersController : ControllerBase
     /// 创建会员订单。
     /// </summary>
     [HttpPost]
-    public async Task<ActionResult<ApiResDto<OrderResDto>>> CreateAsync([FromBody] CreateOrderReqDto reqDto, CancellationToken cancellationToken)
+    public async Task<ApiResDto<OrderResDto>> CreateAsync([FromBody] CreateOrderReqDto reqDto, CancellationToken cancellationToken)
     {
         var result = await _orderAppService.CreateAsync(reqDto, cancellationToken);
-        return ApiResDto<OrderResDto>.Ok(result, HttpContext.TraceIdentifier);
+        return Success(result);
     }
 
     /// <summary>
     /// 查询当前会员订单列表。
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<ApiResDto<PageResDto<OrderResDto>>>> GetListAsync([FromQuery] Guid customerId, [FromQuery] PageReqDto reqDto, CancellationToken cancellationToken)
+    public async Task<ApiResDto<PageResDto<OrderResDto>>> GetListAsync([FromQuery] Guid customerId, [FromQuery] PageReqDto reqDto, CancellationToken cancellationToken)
     {
         var result = await _orderAppService.GetCustomerOrdersAsync(customerId, reqDto, cancellationToken);
-        return ApiResDto<PageResDto<OrderResDto>>.Ok(result, HttpContext.TraceIdentifier);
+        return Success(result);
     }
 
     /// <summary>
@@ -54,19 +55,19 @@ public class OrdersController : ControllerBase
         var result = await _orderAppService.GetByIdAsync(id, cancellationToken);
         if (result is null)
         {
-            return NotFound(ApiResDto<OrderResDto>.Fail("ORDER_NOT_FOUND", "订单不存在。", HttpContext.TraceIdentifier));
+            return NotFoundRes<OrderResDto>("ORDER_NOT_FOUND", "订单不存在。");
         }
 
-        return ApiResDto<OrderResDto>.Ok(result, HttpContext.TraceIdentifier);
+        return Success(result);
     }
 
     /// <summary>
     /// 取消会员订单。
     /// </summary>
     [HttpPost("{id:guid}/cancel")]
-    public async Task<ActionResult<ApiResDto<OrderResDto>>> CancelAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<ApiResDto<OrderResDto>> CancelAsync(Guid id, CancellationToken cancellationToken)
     {
         var result = await _orderAppService.CancelAsync(id, cancellationToken);
-        return ApiResDto<OrderResDto>.Ok(result, HttpContext.TraceIdentifier);
+        return Success(result);
     }
 }

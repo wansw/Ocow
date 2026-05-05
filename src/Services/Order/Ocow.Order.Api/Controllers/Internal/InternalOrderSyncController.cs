@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Ocow.InternalAuth.Extensions;
 using Ocow.Order.Application.Dtos;
 using Ocow.Order.Application.Interfaces;
+using Ocow.Shared.Controllers;
 using Ocow.Shared.Dtos;
 
 namespace Ocow.Order.Api.Controllers.Internal;
@@ -12,7 +13,7 @@ namespace Ocow.Order.Api.Controllers.Internal;
 [ApiController]
 [Route("internal/orders/sync")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.InternalOnlyPolicy)]
-public class InternalOrderSyncController : ControllerBase
+public class InternalOrderSyncController : BaseController
 {
     private readonly IOrderAppService _orderAppService;
 
@@ -26,9 +27,9 @@ public class InternalOrderSyncController : ControllerBase
     /// <summary>
     /// 同步 ERP 订单数据。    /// </summary>
     [HttpPost("erp")]
-    public async Task<ActionResult<ApiResDto<int>>> SyncErpAsync([FromBody] SyncErpOrdersReqDto reqDto, CancellationToken cancellationToken)
+    public async Task<ApiResDto<int>> SyncErpAsync([FromBody] SyncErpOrdersReqDto reqDto, CancellationToken cancellationToken)
     {
         var count = await _orderAppService.SyncErpOrdersAsync(reqDto, cancellationToken);
-        return ApiResDto<int>.Ok(count, HttpContext.TraceIdentifier);
+        return Success(count);
     }
 }
