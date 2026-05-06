@@ -13,6 +13,7 @@ namespace Ocow.Identity.Api.Controllers.Admin;
 
 [Route("api/admin/permissions")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.AdminOnlyPolicy)]
+[Tags("后台权限点")]
 public class AdminPermissionsController : BaseController
 {
     private readonly IRolePermissionAppService _rolePermissionAppService;

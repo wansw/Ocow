@@ -14,6 +14,7 @@ namespace Ocow.Order.Api.Controllers.Client;
 
 [Route("api/orders")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.CustomerOnlyPolicy)]
+[Tags("小程序订单")]
 public class OrdersController : BaseController
 {
     private readonly IOrderAppService _orderAppService;

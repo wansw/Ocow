@@ -10,7 +10,7 @@ namespace Ocow.Identity.Api.Controllers.Admin;
 /// 后台认证接口，用于管理员登录、刷。Token 和退出登录。/// </summary>
 
 [Route("api/admin/auth")]
-[Tags("Auth")]
+[Tags("后台认证")]
 public class AdminAuthController : BaseController
 {
     private readonly IAdminAuthAppService _adminAuthAppService;

@@ -12,6 +12,7 @@ namespace Ocow.Order.Api.Controllers.Internal;
 /// 内部订单同步接口，用。Scheduler、ERP 等内部服务调用。/// </summary>
 [Route("internal/orders/sync")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.InternalOnlyPolicy)]
+[Tags("内部订单同步")]
 public class InternalOrderSyncController : BaseController
 {
     private readonly IOrderAppService _orderAppService;

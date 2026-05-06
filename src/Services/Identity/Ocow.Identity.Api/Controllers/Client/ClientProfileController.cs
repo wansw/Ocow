@@ -12,6 +12,7 @@ namespace Ocow.Identity.Api.Controllers.Client;
 
 [Route("api/auth")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.CustomerOnlyPolicy)]
+[Tags("小程序身份")]
 public class ClientProfileController : BaseController
 {
     /// <summary>

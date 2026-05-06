@@ -14,6 +14,7 @@ namespace Ocow.Identity.Api.Controllers.Admin;
 
 [Route("api/admin/users")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.AdminOnlyPolicy)]
+[Tags("后台管理员")]
 public class AdminUsersController : BaseController
 {
     private readonly IAdminUserAppService _adminUserAppService;
