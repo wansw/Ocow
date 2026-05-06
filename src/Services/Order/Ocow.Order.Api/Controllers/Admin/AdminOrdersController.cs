@@ -11,7 +11,7 @@ namespace Ocow.Order.Api.Controllers.Admin;
 /// <summary>
 /// 后台订单接口，用于管理端查询订单和执行发货。
 /// </summary>
-[ApiController]
+
 [Route("api/admin/orders")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.AdminOnlyPolicy)]
 public class AdminOrdersController : BaseController

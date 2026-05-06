@@ -9,8 +9,9 @@ using Ocow.Shared.Dtos;
 namespace Ocow.Identity.Api.Controllers.Admin;
 
 /// <summary>
-/// 后台管理员接口，用于管理管理员账号。/// </summary>
-[ApiController]
+/// 后台管理员接口，用于管理管理员账号。
+///  </summary>
+
 [Route("api/admin/users")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.AdminOnlyPolicy)]
 public class AdminUsersController : BaseController
@@ -18,14 +19,16 @@ public class AdminUsersController : BaseController
     private readonly IAdminUserAppService _adminUserAppService;
 
     /// <summary>
-    /// 创建后台管理。Controller。    /// </summary>
+    /// 创建后台管理。Controller。    
+    ///  </summary>
     public AdminUsersController(IAdminUserAppService adminUserAppService)
     {
         _adminUserAppService = adminUserAppService;
     }
 
     /// <summary>
-    /// 查询管理员列表。    /// </summary>
+    /// 查询管理员列表。
+    /// </summary>
     [HttpGet]
     public async Task<ApiResDto<PageResDto<AdminUserResDto>>> GetListAsync([FromQuery] PageReqDto reqDto, CancellationToken cancellationToken)
     {
@@ -34,7 +37,8 @@ public class AdminUsersController : BaseController
     }
 
     /// <summary>
-    /// 创建管理员账号。    /// </summary>
+    /// 创建管理员账号。    
+    /// </summary>
     [HttpPost]
     public async Task<ApiResDto<AdminUserResDto>> CreateAsync([FromBody] AdminUserReqDto reqDto, CancellationToken cancellationToken)
     {
@@ -43,7 +47,8 @@ public class AdminUsersController : BaseController
     }
 
     /// <summary>
-    /// 禁用管理员账号。    /// </summary>
+    /// 禁用管理员账号。  
+    /// </summary>
     [HttpPost("{id:guid}/disable")]
     public async Task<ApiResDto<bool>> DisableAsync(Guid id, CancellationToken cancellationToken)
     {

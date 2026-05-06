@@ -6,6 +6,7 @@ namespace Ocow.Shared.Controllers;
 /// <summary>
 /// API 控制器基类，用于统一封装成功、失败和 404 响应。
 /// </summary>
+[ApiController]
 public abstract class BaseController : ControllerBase
 {
     /// <summary>

@@ -10,7 +10,7 @@ namespace Ocow.Identity.Api.Controllers.Admin;
 
 /// <summary>
 /// 后台角色接口，用于管。RBAC 角色。/// </summary>
-[ApiController]
+
 [Route("api/admin/roles")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.AdminOnlyPolicy)]
 public class AdminRolesController : BaseController
@@ -52,7 +52,8 @@ public class AdminRolesController : BaseController
     }
 
     /// <summary>
-    /// 绑定角色权限点。    /// </summary>
+    /// 绑定角色权限点。    
+    /// </summary>
     [HttpPut("{id:guid}/permissions")]
     public async Task<ApiResDto<bool>> BindPermissionsAsync(Guid id, [FromBody] BindRolePermissionsReqDto reqDto, CancellationToken cancellationToken)
     {

@@ -8,7 +8,7 @@ namespace Ocow.Identity.Api.Controllers.Client;
 
 /// <summary>
 /// 小程序认证接口，用于微信登录、刷。Token 和退出登录。/// </summary>
-[ApiController]
+
 [Route("api/auth")]
 public class ClientAuthController : BaseController
 {

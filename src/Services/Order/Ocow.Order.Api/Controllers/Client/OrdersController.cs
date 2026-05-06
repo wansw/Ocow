@@ -11,7 +11,7 @@ namespace Ocow.Order.Api.Controllers.Client;
 /// <summary>
 /// 小程序订单接口，用于会员下单、查询和取消订单。
 /// </summary>
-[ApiController]
+
 [Route("api/orders")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.CustomerOnlyPolicy)]
 public class OrdersController : BaseController

@@ -10,7 +10,7 @@ namespace Ocow.Identity.Api.Controllers.Admin;
 
 /// <summary>
 /// 后台权限点接口，用于查询系统可授权权限点。/// </summary>
-[ApiController]
+
 [Route("api/admin/permissions")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.AdminOnlyPolicy)]
 public class AdminPermissionsController : BaseController
