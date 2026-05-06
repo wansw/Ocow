@@ -14,6 +14,7 @@ namespace Ocow.Shared.Extensions;
 /// </summary>
 public static class OpenApiServiceCollectionExtensions
 {
+    //以后改成在配置中
     private static readonly string[] GroupNames =
     {
         OpenApiGroupNames.Client,
@@ -27,11 +28,16 @@ public static class OpenApiServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddOcowOpenApi(this IServiceCollection services, IConfiguration configuration)
     {
+        // 从配置中获取 OpenAPI 选项，如果没有配置则使用默认值。
         var option = configuration.GetSection("OpenApi").Get<OpenApiOption>() ?? new OpenApiOption();
+        // 将 OpenAPI 选项绑定到 DI 容器中，供后续使用。
         services.Configure<OpenApiOption>(configuration.GetSection("OpenApi"));
+        // 注册 API Explorer，支持 Swagger 生成器发现 API 描述。
         services.AddEndpointsApiExplorer();
+
         services.AddSwaggerGen(options =>
         {
+            // 为每个分组注册一个 Swagger 文档，文档信息从配置中获取。
             foreach (var groupName in GroupNames)
             {
                 options.SwaggerDoc(groupName, new OpenApiInfo
@@ -41,16 +47,20 @@ public static class OpenApiServiceCollectionExtensions
                     Description = option.Description
                 });
             }
-
+            // 配置 Swagger 生成器根据 API 描述的相对路径将接口分配到对应的文档分组中。
             options.DocInclusionPredicate((documentName, apiDescription) =>
             {
                 var groupName = ResolveGroupName(apiDescription.RelativePath ?? string.Empty);
                 return string.Equals(documentName, groupName, StringComparison.OrdinalIgnoreCase);
             });
 
+            // 配置 Swagger 生成器根据 Controller 或 Action 上的 Tags 特性将接口分配到 Swagger UI 内部的业务分类中。
             options.TagActionsBy(apiDescription => new[] { ResolveTagName(apiDescription) });
+            // 配置 Swagger 生成器根据 Controller 和 Action 生成稳定的 OperationId，便于前端识别接口。
             options.CustomOperationIds(ResolveOperationId);
+            // 添加自定义的 OperationFilter，用于设置 Swagger 文档中的默认值。
             options.OperationFilter<SwaggerDefaultValues>();
+            // 配置 Swagger 生成器使用 JWT Bearer 认证方案，并在 Swagger UI 中显示相应的输入框。
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Name = "Authorization",
@@ -60,6 +70,7 @@ public static class OpenApiServiceCollectionExtensions
                 In = ParameterLocation.Header,
                 Description = "请输入 JWT Token。格式：Bearer {token}"
             });
+            // 配置 Swagger 生成器要求所有接口都必须使用 JWT Bearer 认证方案。
             options.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
@@ -75,6 +86,7 @@ public static class OpenApiServiceCollectionExtensions
                 }
             });
 
+            // 配置 Swagger 生成器包含 XML 注释文件，以便在 Swagger UI 中显示接口的注释信息。这里假设 XML 注释文件与程序集位于同一目录下，并且以 .xml 结尾。
             foreach (var xmlFile in Directory.GetFiles(AppContext.BaseDirectory, "*.xml"))
             {
                 options.IncludeXmlComments(xmlFile, includeControllerXmlComments: true);

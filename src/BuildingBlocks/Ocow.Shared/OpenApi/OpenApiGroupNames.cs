@@ -5,18 +5,22 @@
 public static class OpenApiGroupNames
 {
     /// <summary>
-    /// 小程序或用户端接口分组。    /// </summary>
+    /// 小程序或用户端接口分组。    
+    ///  </summary>
     public const string Client = "Client";
 
     /// <summary>
-    /// PC 后台接口分组。    /// </summary>
+    /// PC 后台接口分组。    
+    ///  </summary>
     public const string Admin = "Admin";
 
     /// <summary>
-    /// 内部服务接口分组。    /// </summary>
+    /// 内部服务接口分组。   
+    ///  </summary>
     public const string Internal = "Internal";
 
     /// <summary>
-    /// 第三方回调接口分组。    /// </summary>
+    /// 第三方回调接口分组。   
+    ///  </summary>
     public const string Notify = "Notify";
 }
