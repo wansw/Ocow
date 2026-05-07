@@ -7,11 +7,13 @@ using Ocow.Identity.Infrastructure.Data;
 namespace Ocow.Identity.Migrations.Factories;
 
 /// <summary>
-/// 身份服务迁移上下文工厂，用于 EF Core CLI 生成迁移。/// </summary>
+/// 身份服务迁移上下文工厂，用于 EF Core CLI 生成迁移
+/// </summary>
 public class IdentityDbContextFactory : IDesignTimeDbContextFactory<IdentityDbContext>
 {
     /// <summary>
-    /// 创建设计时身份服务数据库上下文。    /// </summary>
+    /// 创建设计时身份服务数据库上下文。    
+    /// </summary>
     public IdentityDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<IdentityDbContext>();

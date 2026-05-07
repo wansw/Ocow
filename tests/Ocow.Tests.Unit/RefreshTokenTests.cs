@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
+using Ocow.EntityFrameworkCore.Abstractions;
 using Ocow.Identity.Application.Dtos;
 using Ocow.Identity.Application.Interfaces;
 using Ocow.Identity.Application.Options;
@@ -9,11 +10,13 @@ using Ocow.Shared.Dtos;
 namespace Ocow.Tests.Unit;
 
 /// <summary>
-/// 刷新 Token 单元测试，用于验证刷新时会轮换并吊销。Token。/// </summary>
+/// 刷新 Token 单元测试，用于验证刷新时会轮换并吊销 Token。
+/// </summary>
 public class RefreshTokenTests
 {
     /// <summary>
-    /// 验证管理员刷。Token 会吊销。Token 并保存新 Token。    /// </summary>
+    /// 验证管理员刷新 Token 会吊销旧 Token 并保存新 Token。
+    /// </summary>
     [Fact]
     public async Task RefreshToken_WhenAdminTokenValid_ShouldRotateRefreshToken()
     {
@@ -32,7 +35,7 @@ public class RefreshTokenTests
         var service = new AdminAuthAppService(repository, new TokenService(Options.Create(new JwtTokenOption
         {
             Secret = "UnitTestIdentityJwtSecret@2026-EnoughLong"
-        })));
+        })), new FakeUnitOfWork());
 
         var result = await service.RefreshTokenAsync(new RefreshTokenReqDto { RefreshToken = oldToken.Token });
 
@@ -131,6 +134,33 @@ public class RefreshTokenTests
         public Task AddLoginLogAsync(LoginLog loginLog, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
+        }
+    }
+
+    private class FakeUnitOfWork : IUnitOfWork
+    {
+        /// <summary>
+        /// 保存测试上下文变更，内存仓储无需实际提交。
+        /// </summary>
+        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(0);
+        }
+
+        /// <summary>
+        /// 在测试中直接执行事务委托。
+        /// </summary>
+        public Task ExecuteInTransactionAsync(Func<CancellationToken, Task> action, CancellationToken cancellationToken = default)
+        {
+            return action(cancellationToken);
+        }
+
+        /// <summary>
+        /// 在测试中直接执行带返回值的事务委托。
+        /// </summary>
+        public Task<TResult> ExecuteInTransactionAsync<TResult>(Func<CancellationToken, Task<TResult>> action, CancellationToken cancellationToken = default)
+        {
+            return action(cancellationToken);
         }
     }
 }

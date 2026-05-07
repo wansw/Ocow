@@ -14,9 +14,9 @@ namespace Ocow.Identity.Api.Controllers.Admin;
 /// </summary>
 
 [ApiExplorerSettings(GroupName = OpenApiGroupNames.Admin)]
+[Tags("后台权限点")]
 [Route("api/admin/permissions")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.AdminOnlyPolicy)]
-[Tags("后台权限点")]
 public class AdminPermissionsController : BaseController
 {
     private readonly IRolePermissionAppService _rolePermissionAppService;

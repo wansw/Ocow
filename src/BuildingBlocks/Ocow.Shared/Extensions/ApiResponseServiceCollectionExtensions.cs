@@ -18,6 +18,7 @@ public static class ApiResponseServiceCollectionExtensions
         {
             options.InvalidModelStateResponseFactory = context =>
             {
+                //只有校验的dto参数有异常才会进来
                 var errors = context.ModelState
                     .Where(item => item.Value?.Errors.Count > 0)
                     .ToDictionary(

@@ -27,6 +27,7 @@ public static class OpenApiApplicationBuilderExtensions
             options.SwaggerEndpoint($"/swagger/{OpenApiGroupNames.Admin}/swagger.json", "Admin PC 后台接口");
             options.SwaggerEndpoint($"/swagger/{OpenApiGroupNames.Internal}/swagger.json", "Internal 内部服务接口");
             options.SwaggerEndpoint($"/swagger/{OpenApiGroupNames.Notify}/swagger.json", "Notify 第三方回调接口");
+            options.SwaggerEndpoint($"/swagger/{OpenApiGroupNames.Health}/swagger.json", "Health 服务健康检查接口");
             options.RoutePrefix = "swagger";
         });
 

@@ -4,7 +4,9 @@ using Ocow.Identity.Domain.Models;
 namespace Ocow.Identity.Infrastructure.Data;
 
 /// <summary>
-/// 身份认证数据库上下文，用于配置管理员、角色、权限和 Token 表映射。/// </summary>
+/// 身份认证数据库上下文，用于配置管理员、角色、权限和 Token 表映射
+/// 表的映射
+/// </summary>
 public class IdentityDbContext : DbContext
 {
     public IdentityDbContext(DbContextOptions<IdentityDbContext> options)
@@ -29,7 +31,9 @@ public class IdentityDbContext : DbContext
     public DbSet<LoginLog> LoginLogs => Set<LoginLog>();
 
     /// <summary>
-    /// 配置实体特性无法清晰表达的身份服务索引和复合主键规则。    /// </summary>
+    /// 配置实体特性无法清晰表达的身份服务索引和复合主键规则。    
+    /// 表的索引和主键；表和表的关系
+    /// </summary>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AdminUser>()

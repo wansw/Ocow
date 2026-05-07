@@ -23,6 +23,7 @@ public static class OrderInfrastructureServiceCollectionExtensions
         services.AddDbContext<OrderDbContext>(builder => builder
             .UseOcowDatabase(option)
             .AddOcowSaveChangesInterceptors());
+        services.AddOcowUnitOfWork<OrderDbContext>();
         services.AddScoped<IOrderRepository, OrderRepository>();
 
         return services;

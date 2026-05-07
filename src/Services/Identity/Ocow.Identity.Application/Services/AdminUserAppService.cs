@@ -12,14 +12,16 @@ public class AdminUserAppService : IAdminUserAppService
     private readonly IIdentityRepository _repository;
 
     /// <summary>
-    /// 创建管理员应用服务。    /// </summary>
+    /// 创建管理员应用服务。    
+    /// </summary>
     public AdminUserAppService(IIdentityRepository repository)
     {
         _repository = repository;
     }
 
     /// <summary>
-    /// 分页查询管理员列表。    /// </summary>
+    /// 分页查询管理员列表。    
+    /// </summary>
     public async Task<PageResDto<AdminUserResDto>> GetListAsync(PageReqDto reqDto, CancellationToken cancellationToken = default)
     {
         var result = await _repository.GetAdminUsersAsync(reqDto, cancellationToken);
@@ -33,7 +35,8 @@ public class AdminUserAppService : IAdminUserAppService
     }
 
     /// <summary>
-    /// 创建管理员账号。    /// </summary>
+    /// 创建管理员账号。    
+    /// </summary>
     public async Task<AdminUserResDto> CreateAsync(AdminUserReqDto reqDto, CancellationToken cancellationToken = default)
     {
         var adminUser = new AdminUser
@@ -49,14 +52,16 @@ public class AdminUserAppService : IAdminUserAppService
     }
 
     /// <summary>
-    /// 禁用管理员账号。    /// </summary>
+    /// 禁用管理员账号。    
+    /// </summary>
     public async Task DisableAsync(Guid id, CancellationToken cancellationToken = default)
     {
         await _repository.DisableAdminUserAsync(id, cancellationToken);
     }
 
     /// <summary>
-    /// 将管理员实体转换为响。DTO。    /// </summary>
+    /// 将管理员实体转换为响。DTO。    
+    /// </summary>
     private static AdminUserResDto MapToResDto(AdminUser adminUser)
     {
         return new AdminUserResDto

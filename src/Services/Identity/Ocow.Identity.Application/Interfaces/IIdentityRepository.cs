@@ -4,7 +4,8 @@ using Ocow.Shared.Dtos;
 namespace Ocow.Identity.Application.Interfaces;
 
 /// <summary>
-/// 身份认证仓储接口，用于隔离应用层和身份数据库实现。/// </summary>
+/// 身份认证仓储接口，用于隔离应用层和身份数据库实现
+/// </summary>
 public interface IIdentityRepository
 {
     /// <summary>

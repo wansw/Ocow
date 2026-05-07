@@ -20,7 +20,8 @@ public static class OpenApiServiceCollectionExtensions
         OpenApiGroupNames.Client,
         OpenApiGroupNames.Admin,
         OpenApiGroupNames.Internal,
-        OpenApiGroupNames.Notify
+        OpenApiGroupNames.Notify,
+        OpenApiGroupNames.Health
     };
 
     /// <summary>

@@ -9,7 +9,8 @@ namespace Ocow.EntityFrameworkCore.Interceptors;
 public class SoftDeleteSaveChangesInterceptor : SaveChangesInterceptor
 {
     /// <summary>
-    /// 保存前转换软删除实体状态。    /// </summary>
+    /// 保存前转换软删除实体状态。    
+    /// </summary>
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
         ApplySoftDelete(eventData.Context);
@@ -17,7 +18,8 @@ public class SoftDeleteSaveChangesInterceptor : SaveChangesInterceptor
     }
 
     /// <summary>
-    /// 异步保存前转换软删除实体状态。    /// </summary>
+    /// 异步保存前转换软删除实体状态。    
+    /// </summary>
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
     {
         ApplySoftDelete(eventData.Context);
@@ -25,7 +27,8 @@ public class SoftDeleteSaveChangesInterceptor : SaveChangesInterceptor
     }
 
     /// <summary>
-    /// 将删除实体转换为软删除标记。    /// </summary>
+    /// 将删除实体转换为软删除标记。    
+    /// </summary>
     private static void ApplySoftDelete(DbContext? dbContext)
     {
         if (dbContext is null)

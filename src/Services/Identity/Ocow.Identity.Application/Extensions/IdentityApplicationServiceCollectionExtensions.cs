@@ -7,14 +7,21 @@ using Ocow.Identity.Application.Services;
 namespace Ocow.Identity.Application.Extensions;
 
 /// <summary>
-/// 身份认证应用层服务注册扩展。/// </summary>
+/// 注册应用服务
+/// </summary>
 public static class IdentityApplicationServiceCollectionExtensions
 {
     /// <summary>
-    /// 注册身份认证应用服务。Token 服务。    /// </summary>
+    /// 注册应用服务
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="configuration"></param>
+    /// <returns></returns>
     public static IServiceCollection AddIdentityApplication(this IServiceCollection services, IConfiguration configuration)
     {
+        // 从配置中获取 JWT 选项，如果没有配置，则使用默认值。
         services.Configure<JwtTokenOption>(configuration.GetSection("Jwt"));
+        // 注册应用服务
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAdminAuthAppService, AdminAuthAppService>();
         services.AddScoped<IClientAuthAppService, ClientAuthAppService>();

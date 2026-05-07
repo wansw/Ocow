@@ -16,6 +16,7 @@
     <ProjectReference Include="..\Ocow.Order.Infrastructure\Ocow.Order.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.Shared\Ocow.Shared.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.InternalAuth\Ocow.InternalAuth.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.Redis\Ocow.Redis.csproj" />
   </ItemGroup>
 
 </Project>
