@@ -17,9 +17,10 @@ public static class InternalAuthServiceCollectionExtensions
     public const string CustomerJwtScheme = "CustomerJwt";
     public const string AdminJwtScheme = "AdminJwt";
     public const string ServiceJwtScheme = "ServiceJwt";
+
     public const string CustomerOnlyPolicy = "CustomerOnly";
     public const string AdminOnlyPolicy = "AdminOnly";
-    public const string InternalOnlyPolicy = "InternalOnly";
+    public const string InternalOnlyPolicy = "InternalOnly"; 
     public const string OrderShipPolicy = "order.ship";
 
     /// <summary>
@@ -57,6 +58,7 @@ public static class InternalAuthServiceCollectionExtensions
         services.Configure<IdentityJwtOption>(configuration.GetSection("Jwt"));
         services.Configure<InternalAuthOption>(configuration.GetSection("InternalAuth"));
         services.Configure<HmacSignatureOption>(configuration.GetSection("HmacSignature"));
+
         services.AddSingleton<IHmacSignatureService, HmacSignatureService>();
 
         services.AddAuthentication(options =>

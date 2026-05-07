@@ -3,12 +3,14 @@ using Ocow.Identity.Application.Dtos;
 using Ocow.Identity.Application.Interfaces;
 using Ocow.Shared.Controllers;
 using Ocow.Shared.Dtos;
+using Ocow.Shared.OpenApi;
 
 namespace Ocow.Identity.Api.Controllers.Client;
 
 /// <summary>
 /// 小程序认证接口，用于微信登录、刷。Token 和退出登录。/// </summary>
 
+[ApiExplorerSettings(GroupName = OpenApiGroupNames.Client)]
 [Route("api/auth")]
 [Tags("小程序认证")]
 public class ClientAuthController : BaseController

@@ -2,6 +2,7 @@ using Ocow.Identity.Application.Extensions;
 using Ocow.Identity.Infrastructure.Extensions;
 using Ocow.InternalAuth.Extensions;
 using Ocow.Shared.Extensions;
+using Ocow.Shared.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +39,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapGet("/health", () => Results.Ok(new { service = "Ocow.Identity.Api", status = "ok" }))
+    .WithGroupName(OpenApiGroupNames.Internal)
     .WithSummary("身份服务健康检查");
 
 app.Run();

@@ -5,6 +5,7 @@ using Ocow.Identity.Application.Dtos;
 using Ocow.Identity.Application.Interfaces;
 using Ocow.Shared.Controllers;
 using Ocow.Shared.Dtos;
+using Ocow.Shared.OpenApi;
 
 namespace Ocow.Identity.Api.Controllers.Admin;
 
@@ -12,6 +13,7 @@ namespace Ocow.Identity.Api.Controllers.Admin;
 /// 后台管理员接口，用于管理管理员账号。
 ///  </summary>
 
+[ApiExplorerSettings(GroupName = OpenApiGroupNames.Admin)]
 [Route("api/admin/users")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.AdminOnlyPolicy)]
 [Tags("后台管理员")]
