@@ -6,6 +6,7 @@ using Ocow.Shared.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddOcowApiResponse();
 builder.Services.AddOcowOpenApi(builder.Configuration);
 builder.Services.AddOrderApplication();
 builder.Services.AddOrderInfrastructure(builder.Configuration);
@@ -15,6 +16,7 @@ var app = builder.Build();
 
 app.UseOcowOpenApi();
 app.UseOcowRequestTrace();
+app.UseOcowExceptionHandling();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
