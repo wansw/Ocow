@@ -1,4 +1,5 @@
-﻿using System.Text;
+using System.Security.Claims;
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
@@ -11,7 +12,8 @@ using Ocow.InternalAuth.Services;
 namespace Ocow.InternalAuth.Extensions;
 
 /// <summary>
-/// 内部服务认证注册扩展。/// </summary>
+/// 内部服务认证注册扩展。
+/// </summary>
 public static class InternalAuthServiceCollectionExtensions
 {
     public const string CustomerJwtScheme = "CustomerJwt";
@@ -20,11 +22,12 @@ public static class InternalAuthServiceCollectionExtensions
 
     public const string CustomerOnlyPolicy = "CustomerOnly";
     public const string AdminOnlyPolicy = "AdminOnly";
-    public const string InternalOnlyPolicy = "InternalOnly"; 
+    public const string InternalOnlyPolicy = "InternalOnly";
     public const string OrderShipPolicy = "order.ship";
 
     /// <summary>
-    /// 注册 Service JWT 验证策略。    /// </summary>
+    /// 注册 Service JWT 验证策略。
+    /// </summary>
     public static IServiceCollection AddOcowInternalAuth(this IServiceCollection services, IConfiguration configuration)
     {
         var option = configuration.GetSection("InternalAuth").Get<InternalAuthOption>() ?? new InternalAuthOption();
@@ -49,7 +52,8 @@ public static class InternalAuthServiceCollectionExtensions
     }
 
     /// <summary>
-    /// 注册 Customer、Admin、Service 三类 JWT 校验策略和权限策略。    /// </summary>
+    /// 注册 Customer、Admin、Service 三类 JWT 校验策略和权限策略。
+    /// </summary>
     public static IServiceCollection AddOcowJwtAuthorization(this IServiceCollection services, IConfiguration configuration)
     {
         var identityOption = configuration.GetSection("Jwt").Get<IdentityJwtOption>() ?? new IdentityJwtOption();
@@ -60,6 +64,7 @@ public static class InternalAuthServiceCollectionExtensions
         services.Configure<HmacSignatureOption>(configuration.GetSection("HmacSignature"));
 
         services.AddSingleton<IHmacSignatureService, HmacSignatureService>();
+        services.AddScoped<IAdminTokenSessionValidator, RedisAdminTokenSessionValidator>();
 
         services.AddAuthentication(options =>
             {
@@ -67,7 +72,14 @@ public static class InternalAuthServiceCollectionExtensions
                 options.DefaultChallengeScheme = CustomerJwtScheme;
             })
             .AddJwtBearer(CustomerJwtScheme, options => ConfigureJwt(options, identityOption.Issuer, identityOption.Audience, identityOption.Secret))
-            .AddJwtBearer(AdminJwtScheme, options => ConfigureJwt(options, identityOption.Issuer, identityOption.Audience, identityOption.Secret))
+            .AddJwtBearer(AdminJwtScheme, options =>
+            {
+                ConfigureJwt(options, identityOption.Issuer, identityOption.Audience, identityOption.Secret);
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = ValidateAdminTokenSessionAsync
+                };
+            })
             .AddJwtBearer(ServiceJwtScheme, options => ConfigureJwt(options, internalOption.Issuer, internalOption.Audience, internalOption.Secret));
 
         services.AddAuthorization(options =>
@@ -86,7 +98,8 @@ public static class InternalAuthServiceCollectionExtensions
     }
 
     /// <summary>
-    /// 配置 JWT Bearer 校验参数。    /// </summary>
+    /// 配置 JWT Bearer 校验参数。
+    /// </summary>
     private static void ConfigureJwt(JwtBearerOptions options, string issuer, string audience, string secret)
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -102,7 +115,28 @@ public static class InternalAuthServiceCollectionExtensions
     }
 
     /// <summary>
-    /// 配置指定认证方案。scope 要求。    /// </summary>
+    /// 在 Admin JWT 认证成功后继续校验 Redis 集中式会话状态。
+    /// </summary>
+    private static async Task ValidateAdminTokenSessionAsync(TokenValidatedContext context)
+    {
+        try
+        {
+            var tokenSessionValidator = context.HttpContext.RequestServices.GetRequiredService<IAdminTokenSessionValidator>();
+            var isValid = await tokenSessionValidator.ValidateAsync(context.Principal ?? new ClaimsPrincipal());
+            if (!isValid)
+            {
+                context.Fail("Admin Token 会话已失效。");
+            }
+        }
+        catch
+        {
+            context.Fail("Admin Token 会话校验失败。");
+        }
+    }
+
+    /// <summary>
+    /// 配置指定认证方案的 scope 要求。
+    /// </summary>
     private static void RequireScope(AuthorizationPolicyBuilder policy, string scheme, string scope)
     {
         policy.AuthenticationSchemes.Add(scheme);

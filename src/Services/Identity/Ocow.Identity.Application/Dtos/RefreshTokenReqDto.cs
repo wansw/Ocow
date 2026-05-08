@@ -5,6 +5,7 @@
 public class RefreshTokenReqDto
 {
     /// <summary>
-    /// 刷新 Token。    /// </summary>
+    /// 刷新 Token。    
+    /// </summary>
     public string RefreshToken { get; init; } = string.Empty;
 }

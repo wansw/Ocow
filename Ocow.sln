@@ -51,6 +51,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ocow.EntityFrameworkCore", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ocow.Redis", "src\BuildingBlocks\Ocow.Redis\Ocow.Redis.csproj", "{E71E9EB7-B20A-D3ED-5152-B469FCD5C589}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ocow.MessageBus", "src\BuildingBlocks\Ocow.MessageBus\Ocow.MessageBus.csproj", "{D6F8CD57-9215-4F1F-5BF6-BB0ABB712283}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -265,6 +267,18 @@ Global
 		{E71E9EB7-B20A-D3ED-5152-B469FCD5C589}.Release|x64.Build.0 = Release|Any CPU
 		{E71E9EB7-B20A-D3ED-5152-B469FCD5C589}.Release|x86.ActiveCfg = Release|Any CPU
 		{E71E9EB7-B20A-D3ED-5152-B469FCD5C589}.Release|x86.Build.0 = Release|Any CPU
+		{D6F8CD57-9215-4F1F-5BF6-BB0ABB712283}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6F8CD57-9215-4F1F-5BF6-BB0ABB712283}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6F8CD57-9215-4F1F-5BF6-BB0ABB712283}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D6F8CD57-9215-4F1F-5BF6-BB0ABB712283}.Debug|x64.Build.0 = Debug|Any CPU
+		{D6F8CD57-9215-4F1F-5BF6-BB0ABB712283}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D6F8CD57-9215-4F1F-5BF6-BB0ABB712283}.Debug|x86.Build.0 = Debug|Any CPU
+		{D6F8CD57-9215-4F1F-5BF6-BB0ABB712283}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6F8CD57-9215-4F1F-5BF6-BB0ABB712283}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6F8CD57-9215-4F1F-5BF6-BB0ABB712283}.Release|x64.ActiveCfg = Release|Any CPU
+		{D6F8CD57-9215-4F1F-5BF6-BB0ABB712283}.Release|x64.Build.0 = Release|Any CPU
+		{D6F8CD57-9215-4F1F-5BF6-BB0ABB712283}.Release|x86.ActiveCfg = Release|Any CPU
+		{D6F8CD57-9215-4F1F-5BF6-BB0ABB712283}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -292,6 +306,7 @@ Global
 		{86C40916-E98E-4E3D-B171-4878F2D976FB} = {1BFC9479-12BF-35C3-06B8-42D89D95092B}
 		{24A4F54D-1BA7-4612-BC9E-5BF07868B7A9} = {90298CBA-BD6F-3A0A-69D5-97CAD7B05E7E}
 		{E71E9EB7-B20A-D3ED-5152-B469FCD5C589} = {90298CBA-BD6F-3A0A-69D5-97CAD7B05E7E}
+		{D6F8CD57-9215-4F1F-5BF6-BB0ABB712283} = {90298CBA-BD6F-3A0A-69D5-97CAD7B05E7E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {920659E0-9FDA-4D91-A1D1-CC084BA87D5D}

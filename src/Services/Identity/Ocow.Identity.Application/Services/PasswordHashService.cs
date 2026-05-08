@@ -4,7 +4,8 @@ using System.Text;
 namespace Ocow.Identity.Application.Services;
 
 /// <summary>
-/// 密码摘要服务，用。MVP 阶段生成和校验密码哈希。/// </summary>
+/// 密码摘要服务，用。MVP 阶段生成和校验密码哈希
+/// </summary>
 public static class PasswordHashService
 {
     /// <summary>

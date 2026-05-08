@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -11,14 +11,14 @@ using Ocow.Identity.Application.Options;
 namespace Ocow.Identity.Application.Services;
 
 /// <summary>
-/// Token 服务实现，用于签。Customer JWT 。Admin JWT 
+/// Token 服务实现，用于签发 Customer JWT 和 Admin JWT。
 /// </summary>
 public class TokenService : ITokenService
 {
     private readonly JwtTokenOption _option;
 
     /// <summary>
-    /// 创建 Token 服务。    
+    /// 创建 Token 服务。
     /// </summary>
     public TokenService(IOptions<JwtTokenOption> option)
     {
@@ -26,15 +26,21 @@ public class TokenService : ITokenService
     }
 
     /// <summary>
-    /// 签发登录 Token。    
+    /// 签发登录 Token。
     /// </summary>
-    public AuthTokenResDto IssueToken(Guid subjectId, string scope, IEnumerable<string> permissions, IEnumerable<Claim>? extraClaims = null)
+    public AuthTokenResDto IssueToken(Guid subjectId,string scope,IEnumerable<string> permissions,
+        IEnumerable<Claim>? extraClaims = null,Guid? sessionId = null,string? jwtId = null)
     {
         var permissionList = permissions.Distinct().ToList();
         var expiresAt = DateTime.UtcNow.AddMinutes(_option.AccessTokenMinutes);
+        var tokenSessionId = sessionId ?? Guid.NewGuid();
+        var tokenJwtId = string.IsNullOrWhiteSpace(jwtId) ? Guid.NewGuid().ToString("N") : jwtId;
+
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Sub, subjectId.ToString()),
+            new(JwtRegisteredClaimNames.Jti, tokenJwtId),
+            new("sid", tokenSessionId.ToString()),
             new("scope", scope)
         };
 

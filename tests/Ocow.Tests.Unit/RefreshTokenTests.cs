@@ -2,9 +2,11 @@ using Microsoft.Extensions.Options;
 using Ocow.EntityFrameworkCore.Abstractions;
 using Ocow.Identity.Application.Dtos;
 using Ocow.Identity.Application.Interfaces;
+using Ocow.Identity.Application.Models;
 using Ocow.Identity.Application.Options;
 using Ocow.Identity.Application.Services;
 using Ocow.Identity.Domain.Models;
+using Ocow.InternalAuth.Models;
 using Ocow.Shared.Dtos;
 
 namespace Ocow.Tests.Unit;
@@ -32,16 +34,64 @@ public class RefreshTokenTests
         repository.RefreshTokens.Add(oldToken);
         repository.PermissionCodes.Add("order.ship");
 
+        var tokenSessionService = new FakeTokenSessionService();
+        await tokenSessionService.SaveAdminRefreshTokenAsync(oldToken.Token, new RefreshTokenSession
+        {
+            SubjectId = oldToken.SubjectId,
+            SessionId = Guid.NewGuid(),
+            JwtId = "old-jti",
+            AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(30),
+            RefreshTokenExpiresAt = oldToken.ExpiresAt
+        });
+
         var service = new AdminAuthAppService(repository, new TokenService(Options.Create(new JwtTokenOption
         {
             Secret = "UnitTestIdentityJwtSecret@2026-EnoughLong"
-        })), new FakeUnitOfWork());
+        })), tokenSessionService, new FakeUnitOfWork());
 
         var result = await service.RefreshTokenAsync(new RefreshTokenReqDto { RefreshToken = oldToken.Token });
 
         Assert.NotEqual(oldToken.Token, result.RefreshToken);
         Assert.NotNull(oldToken.RevokedAt);
         Assert.Equal(2, repository.RefreshTokens.Count);
+        Assert.True(tokenSessionService.RevokedSessionCount > 0);
+    }
+
+    private class FakeTokenSessionService : IRedisTokenSessionService
+    {
+        private readonly Dictionary<string, RefreshTokenSession> _refreshTokens = new();
+
+        public int RevokedSessionCount { get; private set; }
+
+        public Task SaveAdminSessionAsync(TokenSession session, CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task SaveAdminRefreshTokenAsync(string refreshToken, RefreshTokenSession session, CancellationToken cancellationToken = default)
+        {
+            _refreshTokens[refreshToken] = session;
+            return Task.CompletedTask;
+        }
+
+        public Task<RefreshTokenSession?> GetAdminRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default)
+        {
+            _refreshTokens.TryGetValue(refreshToken, out var session);
+            return Task.FromResult(session);
+        }
+
+        public Task RemoveAdminRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default)
+        {
+            _refreshTokens.Remove(refreshToken);
+            return Task.CompletedTask;
+        }
+
+        public Task RevokeAdminSessionAsync(Guid sessionId, string jwtId, DateTime expiresAt, CancellationToken cancellationToken = default)
+        {
+            RevokedSessionCount++;
+            return Task.CompletedTask;
+        }
+
     }
 
     private class FakeIdentityRepository : IIdentityRepository

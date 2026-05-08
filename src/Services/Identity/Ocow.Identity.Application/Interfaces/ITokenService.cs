@@ -9,5 +9,11 @@ public interface ITokenService
 {
     /// <summary>
     /// 签发登录 Token。    /// </summary>
-    AuthTokenResDto IssueToken(Guid subjectId, string scope, IEnumerable<string> permissions, IEnumerable<Claim>? extraClaims = null);
+    AuthTokenResDto IssueToken(
+        Guid subjectId,
+        string scope,
+        IEnumerable<string> permissions,
+        IEnumerable<Claim>? extraClaims = null,
+        Guid? sessionId = null,
+        string? jwtId = null);
 }

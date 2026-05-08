@@ -23,6 +23,7 @@ public static class IdentityApplicationServiceCollectionExtensions
         services.Configure<JwtTokenOption>(configuration.GetSection("Jwt"));
         // 注册应用服务
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IRedisTokenSessionService, RedisTokenSessionService>();
         services.AddScoped<IAdminAuthAppService, AdminAuthAppService>();
         services.AddScoped<IClientAuthAppService, ClientAuthAppService>();
         services.AddScoped<IAdminUserAppService, AdminUserAppService>();

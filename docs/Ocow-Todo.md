@@ -70,3 +70,9 @@
 ```
 
 这条线走完，骨架就比较像“能持续扩服务”的底座了，再做 PC 后端角色权限、菜单管理和前端界面会更稳。
+
+1. **AccessToken 不直接全量存 Redis** - 给 JWT 增加 jti 和 sid - Redis 只存会话状态或黑名单 - Key 示例： ocow:identity:session:admin:{sid}
+2. **RefreshToken 建议 DB + Redis** - DB 做最终持久化和审计 - Redis 做快速校验和过期控制 - 刷新时先查 Redis，没命中再查 DB，可回填 Redis
+3. **后台 Admin JWT 认证建议查 Redis** - 判断 sid 是否还有效 - 判断 jti 是否在黑名单 - 用户禁用、改密码、角色权限变更后，可以立即让旧 Token 失效
+4. **小程序 Customer JWT 可以轻一点** - 不一定每次都查 Redis - 除非你需要强制下线、封号立即生效、单设备登录
+5. **权限和菜单非常适合 Redis 缓存** - 后台角色权限、菜单树可以缓存 - 角色、菜单、权限修改时主动删除缓存
