@@ -140,6 +140,21 @@ public class RefreshTokenTests
             throw new NotSupportedException();
         }
 
+        public Task<IReadOnlyList<Menu>> GetMenusAsync(CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task<IReadOnlyList<Menu>> GetAdminMenusAsync(Guid adminUserId, CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task<Menu> SaveMenuAsync(Menu menu, CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
+
         public Task BindRolePermissionsAsync(Guid roleId, IReadOnlyCollection<Guid> permissionIds, CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();

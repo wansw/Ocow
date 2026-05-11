@@ -1,11 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Ocow.Identity.Domain.Models;
 
 namespace Ocow.Identity.Infrastructure.Data;
 
 /// <summary>
-/// 身份认证数据库上下文，用于配置管理员、角色、权限和 Token 表映射
-/// 表的映射
+/// 身份认证数据库上下文，用于配置管理员、角色、权限、菜单和 Token 表映射。
 /// </summary>
 public class IdentityDbContext : DbContext
 {
@@ -20,6 +19,8 @@ public class IdentityDbContext : DbContext
 
     public DbSet<Permission> Permissions => Set<Permission>();
 
+    public DbSet<Menu> Menus => Set<Menu>();
+
     public DbSet<AdminUserRole> AdminUserRoles => Set<AdminUserRole>();
 
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
@@ -31,8 +32,7 @@ public class IdentityDbContext : DbContext
     public DbSet<LoginLog> LoginLogs => Set<LoginLog>();
 
     /// <summary>
-    /// 配置实体特性无法清晰表达的身份服务索引和复合主键规则。    
-    /// 表的索引和主键；表和表的关系
+    /// 配置实体特性无法清晰表达的身份服务索引和复合主键规则。
     /// </summary>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -45,6 +45,10 @@ public class IdentityDbContext : DbContext
             .IsUnique();
 
         modelBuilder.Entity<Permission>()
+            .HasIndex(x => x.Code)
+            .IsUnique();
+
+        modelBuilder.Entity<Menu>()
             .HasIndex(x => x.Code)
             .IsUnique();
 
@@ -80,6 +84,18 @@ public class IdentityDbContext : DbContext
                 .WithMany(x => x.RolePermissions)
                 .HasForeignKey(x => x.PermissionId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Menu>(entity =>
+        {
+            entity.HasOne(x => x.Parent)
+                .WithMany(x => x.Children)
+                .HasForeignKey(x => x.ParentId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(x => x.Permission)
+                .WithMany()
+                .HasForeignKey(x => x.PermissionId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
     }
 }

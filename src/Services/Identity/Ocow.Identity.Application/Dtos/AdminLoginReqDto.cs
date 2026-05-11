@@ -1,14 +1,21 @@
-﻿namespace Ocow.Identity.Application.Dtos;
+﻿using System.ComponentModel;
+
+namespace Ocow.Identity.Application.Dtos;
 
 /// <summary>
-/// 后台管理员登录请。DTO。/// </summary>
+/// 后台管理员登录请。DTO
+/// </summary>
 public class AdminLoginReqDto
 {
     /// <summary>
-    /// 管理员用户名。    /// </summary>
-    public string UserName { get; init; } = string.Empty;
+    /// 管理员用户名。    
+    /// </summary>
+    [DefaultValue("admin")]
+    public string UserName { get; init; }
 
     /// <summary>
-    /// 管理员登录密码。    /// </summary>
-    public string Password { get; init; } = string.Empty;
+    /// 管理员登录密码。    
+    /// </summary>
+    [DefaultValue("Admin@123456")]
+    public string Password { get; init; }
 }

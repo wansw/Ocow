@@ -7,12 +7,12 @@ namespace Ocow.Shared.Extensions;
 /// <summary>
 /// API 统一响应服务注册扩展。
 /// </summary>
-public static class ApiResponseServiceCollectionExtensions
+public static class ValidDtoServiceCollectionExtensions
 {
     /// <summary>
     /// 注册统一 API 行为配置，用于把参数校验失败转换成标准接口响应。
     /// </summary>
-    public static IServiceCollection AddOcowApiResponse(this IServiceCollection services)
+    public static IServiceCollection AddOcowValidDtoResponse(this IServiceCollection services)
     {
         services.Configure<ApiBehaviorOptions>(options =>
         {

@@ -107,6 +107,7 @@ public class AdminAuthAppService : IAdminAuthAppService
             }
 
             await _redisTokenSessionService.RemoveAdminRefreshTokenAsync(reqDto.RefreshToken, tokenCancellationToken);
+
             await SaveAdminTokenSessionAsync(oldRefreshToken.SubjectId, token, refreshToken.ExpiresAt, tokenCancellationToken);
 
             return token;

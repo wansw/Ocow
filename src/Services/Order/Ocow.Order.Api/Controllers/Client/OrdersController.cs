@@ -5,7 +5,7 @@ using Ocow.Order.Application.Dtos;
 using Ocow.Order.Application.Interfaces;
 using Ocow.Shared.Controllers;
 using Ocow.Shared.Dtos;
-using Ocow.Shared.OpenApi;
+using Ocow.Shared.SwaggerApi;
 
 namespace Ocow.Order.Api.Controllers.Client;
 
@@ -13,7 +13,7 @@ namespace Ocow.Order.Api.Controllers.Client;
 /// 小程序订单接口，用于会员下单、查询和取消订单。
 /// </summary>
 
-[ApiExplorerSettings(GroupName = OpenApiGroupNames.Client)]
+[ApiExplorerSettings(GroupName = SwaggerApiGroupNames.Client)]
 [Route("api/orders")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.CustomerOnlyPolicy)]
 [Tags("小程序订单")]

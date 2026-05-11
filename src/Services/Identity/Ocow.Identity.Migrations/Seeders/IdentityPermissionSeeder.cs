@@ -6,7 +6,8 @@ using Ocow.Identity.Infrastructure.Data;
 namespace Ocow.Identity.Migrations.Seeders;
 
 /// <summary>
-/// 身份服务权限点播种器，用于幂等初始化后台权限点。/// </summary>
+/// 身份服务权限点播种器，用于幂等初始化后台权限点
+/// </summary>
 public class IdentityPermissionSeeder : IDataSeeder
 {
     private readonly IdentityDbContext _dbContext;

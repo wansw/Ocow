@@ -1,19 +1,19 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ocow.InternalAuth.Extensions;
 using Ocow.Identity.Application.Dtos;
 using Ocow.Identity.Application.Interfaces;
+using Ocow.InternalAuth.Attributes;
+using Ocow.InternalAuth.Extensions;
 using Ocow.Shared.Controllers;
 using Ocow.Shared.Dtos;
-using Ocow.Shared.OpenApi;
+using Ocow.Shared.SwaggerApi;
 
 namespace Ocow.Identity.Api.Controllers.Admin;
 
 /// <summary>
 /// 后台管理员接口，用于管理管理员账号。
-///  </summary>
-
-[ApiExplorerSettings(GroupName = OpenApiGroupNames.Admin)]
+/// </summary>
+[ApiExplorerSettings(GroupName = SwaggerApiGroupNames.Admin)]
 [Route("api/admin/users")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.AdminOnlyPolicy)]
 [Tags("后台管理员")]
@@ -22,8 +22,8 @@ public class AdminUsersController : BaseController
     private readonly IAdminUserAppService _adminUserAppService;
 
     /// <summary>
-    /// 创建后台管理。Controller。    
-    ///  </summary>
+    /// 创建后台管理员 Controller。
+    /// </summary>
     public AdminUsersController(IAdminUserAppService adminUserAppService)
     {
         _adminUserAppService = adminUserAppService;
@@ -33,6 +33,7 @@ public class AdminUsersController : BaseController
     /// 查询管理员列表。
     /// </summary>
     [HttpGet]
+    [PermissionAuthorize("identity.admin-user.read")]
     public async Task<ApiResDto<PageResDto<AdminUserResDto>>> GetListAsync([FromQuery] PageReqDto reqDto, CancellationToken cancellationToken)
     {
         var result = await _adminUserAppService.GetListAsync(reqDto, cancellationToken);
@@ -40,9 +41,10 @@ public class AdminUsersController : BaseController
     }
 
     /// <summary>
-    /// 创建管理员账号。    
+    /// 创建管理员账号。
     /// </summary>
     [HttpPost]
+    [PermissionAuthorize("identity.admin-user.create")]
     public async Task<ApiResDto<AdminUserResDto>> CreateAsync([FromBody] AdminUserReqDto reqDto, CancellationToken cancellationToken)
     {
         var result = await _adminUserAppService.CreateAsync(reqDto, cancellationToken);
@@ -50,9 +52,10 @@ public class AdminUsersController : BaseController
     }
 
     /// <summary>
-    /// 禁用管理员账号。  
+    /// 禁用管理员账号。
     /// </summary>
     [HttpPost("{id:guid}/disable")]
+    [PermissionAuthorize("identity.admin-user.disable")]
     public async Task<ApiResDto<bool>> DisableAsync(Guid id, CancellationToken cancellationToken)
     {
         await _adminUserAppService.DisableAsync(id, cancellationToken);

@@ -2,7 +2,7 @@
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Ocow.Shared.OpenApi;
+namespace Ocow.Shared.SwaggerApi;
 
 /// <summary>
 /// Swagger 默认值过滤器，用于补齐接口描述中的默认响应信息。

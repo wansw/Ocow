@@ -5,13 +5,13 @@ using Ocow.Order.Application.Dtos;
 using Ocow.Order.Application.Interfaces;
 using Ocow.Shared.Controllers;
 using Ocow.Shared.Dtos;
-using Ocow.Shared.OpenApi;
+using Ocow.Shared.SwaggerApi;
 
 namespace Ocow.Order.Api.Controllers.Internal;
 
 /// <summary>
 /// 内部订单同步接口，用。Scheduler、ERP 等内部服务调用。/// </summary>
-[ApiExplorerSettings(GroupName = OpenApiGroupNames.Internal)]
+[ApiExplorerSettings(GroupName = SwaggerApiGroupNames.Internal)]
 [Route("internal/orders/sync")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.InternalOnlyPolicy)]
 [Tags("内部订单同步")]

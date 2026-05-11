@@ -3,7 +3,7 @@ using Ocow.Identity.Application.Dtos;
 using Ocow.Identity.Application.Interfaces;
 using Ocow.Shared.Controllers;
 using Ocow.Shared.Dtos;
-using Ocow.Shared.OpenApi;
+using Ocow.Shared.SwaggerApi;
 
 namespace Ocow.Identity.Api.Controllers.Admin;
 
@@ -11,7 +11,7 @@ namespace Ocow.Identity.Api.Controllers.Admin;
 /// 后台认证接口，用于管理员登录、刷。Token 和退出登录。
 /// </summary>
 
-[ApiExplorerSettings(GroupName = OpenApiGroupNames.Admin)]
+[ApiExplorerSettings(GroupName = SwaggerApiGroupNames.Admin)]
 [Route("api/admin/auth")]
 [Tags("后台认证")]
 public class AdminAuthController : BaseController

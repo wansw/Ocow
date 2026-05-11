@@ -34,19 +34,7 @@ public static class InternalAuthServiceCollectionExtensions
         services.Configure<InternalAuthOption>(configuration.GetSection("InternalAuth"));
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = option.Issuer,
-                    ValidAudience = option.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(option.Secret))
-                };
-            });
+            .AddJwtBearer(options => ConfigureJwt(options, option.Issuer, option.Audience, option.Secret));
 
         return services;
     }
@@ -65,6 +53,8 @@ public static class InternalAuthServiceCollectionExtensions
 
         services.AddSingleton<IHmacSignatureService, HmacSignatureService>();
         services.AddScoped<IAdminTokenSessionValidator, RedisAdminTokenSessionValidator>();
+        services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
+        services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
         services.AddAuthentication(options =>
             {
@@ -102,6 +92,7 @@ public static class InternalAuthServiceCollectionExtensions
     /// </summary>
     private static void ConfigureJwt(JwtBearerOptions options, string issuer, string audience, string secret)
     {
+        options.MapInboundClaims = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -121,8 +112,8 @@ public static class InternalAuthServiceCollectionExtensions
     {
         try
         {
-            var tokenSessionValidator = context.HttpContext.RequestServices.GetRequiredService<IAdminTokenSessionValidator>();
-            var isValid = await tokenSessionValidator.ValidateAsync(context.Principal ?? new ClaimsPrincipal());
+            var validator = context.HttpContext.RequestServices.GetRequiredService<IAdminTokenSessionValidator>();
+            var isValid = await validator.ValidateAsync(context.Principal ?? new ClaimsPrincipal());
             if (!isValid)
             {
                 context.Fail("Admin Token 会话已失效。");

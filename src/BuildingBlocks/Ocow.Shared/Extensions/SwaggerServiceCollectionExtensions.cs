@@ -4,30 +4,29 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using Ocow.Shared.OpenApi;
 using Ocow.Shared.Options;
+using Ocow.Shared.SwaggerApi;
 
 namespace Ocow.Shared.Extensions;
 
 /// <summary>
-/// OpenAPI 服务注册扩展。
+/// Swagger / OpenAPI 服务注册扩展。
 /// </summary>
-public static class OpenApiServiceCollectionExtensions
+public static class SwaggerServiceCollectionExtensions
 {
-    // TODO：后续如需增加 Partner、Merchant 等文档大分组，可改为从 OpenApi 配置读取。
     private static readonly string[] GroupNames =
     {
-        OpenApiGroupNames.Client,
-        OpenApiGroupNames.Admin,
-        OpenApiGroupNames.Internal,
-        OpenApiGroupNames.Notify,
-        OpenApiGroupNames.Health
+        SwaggerApiGroupNames.Client,
+        SwaggerApiGroupNames.Admin,
+        SwaggerApiGroupNames.Internal,
+        SwaggerApiGroupNames.Notify,
+        SwaggerApiGroupNames.Health
     };
 
     /// <summary>
     /// 注册 Ocow 统一 Swagger / OpenAPI 配置。
     /// </summary>
-    public static IServiceCollection AddOcowOpenApi(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddOcowSwagger(this IServiceCollection services, IConfiguration configuration)
     {
         var option = configuration.GetSection("OpenApi").Get<OpenApiOption>() ?? new OpenApiOption();
         services.Configure<OpenApiOption>(configuration.GetSection("OpenApi"));
@@ -54,6 +53,7 @@ public static class OpenApiServiceCollectionExtensions
             options.TagActionsBy(apiDescription => new[] { ResolveTagName(apiDescription) });
             options.CustomOperationIds(ResolveOperationId);
             options.OperationFilter<SwaggerDefaultValues>();
+
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Name = "Authorization",
@@ -61,8 +61,9 @@ public static class OpenApiServiceCollectionExtensions
                 Scheme = "bearer",
                 BearerFormat = "JWT",
                 In = ParameterLocation.Header,
-                Description = "请输入 JWT Token。格式：Bearer {token}"
+                Description = "请输入 JWT accessToken。Swagger 会自动添加 Bearer 前缀，这里不要手动输入 Bearer。"
             });
+
             options.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
@@ -88,7 +89,7 @@ public static class OpenApiServiceCollectionExtensions
     }
 
     /// <summary>
-    /// 根据 ApiExplorer 分组解析 OpenAPI 文档大分组，未声明时按路径兜底。
+    /// 根据 ApiExplorer 分组解析 Swagger 文档大分组，未声明时按路径兜底。
     /// </summary>
     private static string ResolveGroupName(ApiDescription apiDescription)
     {
@@ -101,31 +102,31 @@ public static class OpenApiServiceCollectionExtensions
     }
 
     /// <summary>
-    /// 根据接口路径兜底解析 OpenAPI 文档大分组。
+    /// 根据接口路径兜底解析 Swagger 文档大分组。
     /// </summary>
     private static string ResolveGroupNameByPath(string relativePath)
     {
         var path = relativePath.TrimStart('/').ToLowerInvariant();
         if (path.Contains("notify"))
         {
-            return OpenApiGroupNames.Notify;
+            return SwaggerApiGroupNames.Notify;
         }
 
         if (path.StartsWith("internal/"))
         {
-            return OpenApiGroupNames.Internal;
+            return SwaggerApiGroupNames.Internal;
         }
 
         if (path.StartsWith("api/admin/"))
         {
-            return OpenApiGroupNames.Admin;
+            return SwaggerApiGroupNames.Admin;
         }
 
-        return OpenApiGroupNames.Client;
+        return SwaggerApiGroupNames.Client;
     }
 
     /// <summary>
-    /// 根据 Controller 或 Action 上的 Tags 特性解析 Swagger UI 内部业务分类。
+    /// 获取方法的小分组名称，用于 Swagger UI 内部接口分类展示。
     /// </summary>
     private static string ResolveTagName(ApiDescription apiDescription)
     {
@@ -143,7 +144,7 @@ public static class OpenApiServiceCollectionExtensions
     }
 
     /// <summary>
-    /// 根据 Controller 和 Action 生成稳定的 Swagger OperationId，便于前端识别接口。
+    /// 根据 Controller 和 Action 生成稳定的 Swagger OperationId。
     /// </summary>
     private static string? ResolveOperationId(ApiDescription apiDescription)
     {

@@ -4,21 +4,23 @@ using Ocow.InternalAuth.Extensions;
 using Ocow.Identity.Application.Dtos;
 using Ocow.Shared.Controllers;
 using Ocow.Shared.Dtos;
-using Ocow.Shared.OpenApi;
+using Ocow.Shared.SwaggerApi;
 
 namespace Ocow.Identity.Api.Controllers.Client;
 
 /// <summary>
-/// 小程序当前身份接口，用于查询当前登录会员身份。/// </summary>
+/// 小程序当前身份接口，用于查询当前登录会员身份
+/// </summary>
 
-[ApiExplorerSettings(GroupName = OpenApiGroupNames.Client)]
+[ApiExplorerSettings(GroupName = SwaggerApiGroupNames.Client)]
 [Route("api/auth")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.CustomerOnlyPolicy)]
 [Tags("小程序身份")]
 public class ClientProfileController : BaseController
 {
     /// <summary>
-    /// 查询当前小程序用户身份。    /// </summary>
+    /// 查询当前小程序用户身份。    
+    /// </summary>
     [HttpGet("me")]
     public ApiResDto<ClientProfileResDto> GetMe()
     {

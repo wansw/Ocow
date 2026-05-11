@@ -4,7 +4,8 @@ using Ocow.Identity.Infrastructure.Data;
 namespace Ocow.Identity.Migrations.Seeders;
 
 /// <summary>
-/// 身份服务种子数据执行器，用于按权限、角色、管理员顺序初始化基础数据。/// </summary>
+/// 身份服务种子数据执行器，用于按权限、角色、管理员顺序初始化基础数据
+/// </summary>
 public class IdentitySeedRunner : IDataSeedRunner
 {
     private readonly IReadOnlyList<IDataSeeder> _seeders;
@@ -15,6 +16,7 @@ public class IdentitySeedRunner : IDataSeedRunner
         [
             new IdentityPermissionSeeder(dbContext),
             new IdentityRoleSeeder(dbContext),
+            new IdentityMenuSeeder(dbContext),
             new IdentityAdminUserSeeder(dbContext)
         ];
     }

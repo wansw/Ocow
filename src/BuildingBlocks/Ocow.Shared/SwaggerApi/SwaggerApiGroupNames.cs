@@ -1,9 +1,9 @@
-namespace Ocow.Shared.OpenApi;
+namespace Ocow.Shared.SwaggerApi;
 
 /// <summary>
 /// OpenAPI 分组名称常量，用于区分小程序端、后台端、内部服务、回调接口和健康检查接口。
 /// </summary>
-public static class OpenApiGroupNames
+public static class SwaggerApiGroupNames
 {
     /// <summary>
     /// 小程序或用户端接口分组。

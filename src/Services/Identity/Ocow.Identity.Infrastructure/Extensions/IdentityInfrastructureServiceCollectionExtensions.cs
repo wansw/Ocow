@@ -10,11 +10,13 @@ using Ocow.Identity.Infrastructure.Repositories;
 namespace Ocow.Identity.Infrastructure.Extensions;
 
 /// <summary>
-/// 身份认证基础设施服务注册扩展。/// </summary>
+/// 身份认证基础设施服务注册扩展
+/// </summary>
 public static class IdentityInfrastructureServiceCollectionExtensions
 {
     /// <summary>
-    /// 注册身份服务数据库上下文和仓储实现。    /// </summary>
+    /// 注册身份服务数据库上下文和仓储实现。    
+    /// </summary>
     public static IServiceCollection AddIdentityInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         // 从配置中获取数据库选项，如果没有配置，则使用默认值。

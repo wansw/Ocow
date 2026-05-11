@@ -24,7 +24,8 @@ public class Permission
     public string Module { get; set; } = string.Empty;
 
     /// <summary>
-    /// 角色权限绑定集合，用于表达权限点与角色的多对多关系。    /// </summary>
+    /// 角色权限绑定集合，用于表达权限点与角色的多对多关系。    
+    /// </summary>
     [InverseProperty(nameof(RolePermission.Permission))]
     public List<RolePermission> RolePermissions { get; set; } = new();
 }

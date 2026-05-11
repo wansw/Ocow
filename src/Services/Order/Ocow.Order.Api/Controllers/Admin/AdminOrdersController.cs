@@ -4,8 +4,8 @@ using Ocow.InternalAuth.Extensions;
 using Ocow.Order.Application.Dtos;
 using Ocow.Order.Application.Interfaces;
 using Ocow.Shared.Controllers;
-using Ocow.Shared.Dtos;
-using Ocow.Shared.OpenApi;
+using Ocow.Shared.Dtos; 
+using Ocow.Shared.SwaggerApi;
 
 namespace Ocow.Order.Api.Controllers.Admin;
 
@@ -13,7 +13,7 @@ namespace Ocow.Order.Api.Controllers.Admin;
 /// 后台订单接口，用于管理端查询订单和执行发货。
 /// </summary>
 
-[ApiExplorerSettings(GroupName = OpenApiGroupNames.Admin)]
+[ApiExplorerSettings(GroupName = SwaggerApiGroupNames.Admin)]
 [Route("api/admin/orders")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.AdminOnlyPolicy)]
 [Tags("后台订单")]

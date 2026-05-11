@@ -5,7 +5,7 @@ using Ocow.Identity.Migrations.Seeders;
 namespace Ocow.Tests.Unit;
 
 /// <summary>
-/// 身份服务种子数据测试，用于验证默认权限、角色和管理员初始化规则。
+/// 身份服务种子数据测试，用于验证默认权限、角色、菜单和管理员初始化规则。
 /// </summary>
 public class IdentitySeederTests
 {
@@ -35,10 +35,11 @@ public class IdentitySeederTests
             await runner.RunAsync();
             await runner.RunAsync();
 
-            Assert.Equal(8, await dbContext.Permissions.CountAsync());
+            Assert.Equal(17, await dbContext.Permissions.CountAsync());
             Assert.Single(await dbContext.Roles.ToListAsync());
             Assert.Single(await dbContext.AdminUsers.ToListAsync());
-            Assert.Equal(8, await dbContext.RolePermissions.CountAsync());
+            Assert.Equal(17, await dbContext.RolePermissions.CountAsync());
+            Assert.Equal(10, await dbContext.Menus.CountAsync());
             Assert.Single(await dbContext.AdminUserRoles.ToListAsync());
         }
         finally
