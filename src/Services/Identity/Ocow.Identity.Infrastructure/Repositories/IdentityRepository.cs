@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Ocow.EntityFrameworkCore.Repositories;
 using Ocow.Identity.Application.Interfaces;
 using Ocow.Identity.Domain.Enums;
 using Ocow.Identity.Domain.Models;
@@ -10,13 +11,11 @@ namespace Ocow.Identity.Infrastructure.Repositories;
 /// <summary>
 /// 身份认证仓储 EF Core 实现，用于持久化管理员、角色、权限、菜单和 Token。
 /// </summary>
-public class IdentityRepository : IIdentityRepository
+public class IdentityRepository : EfRepositoryBase<IdentityDbContext, AdminUser, Guid>, IIdentityRepository
 {
-    private readonly IdentityDbContext _dbContext;
-
     public IdentityRepository(IdentityDbContext dbContext)
+        : base(dbContext)
     {
-        _dbContext = dbContext;
     }
 
     /// <summary>
@@ -24,7 +23,7 @@ public class IdentityRepository : IIdentityRepository
     /// </summary>
     public async Task<AdminUser?> GetAdminUserByNameAsync(string userName, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.AdminUsers.FirstOrDefaultAsync(x => x.UserName == userName, cancellationToken);
+        return await DbContext.AdminUsers.FirstOrDefaultAsync(x => x.UserName == userName, cancellationToken);
     }
 
     /// <summary>
@@ -32,13 +31,13 @@ public class IdentityRepository : IIdentityRepository
     /// </summary>
     public async Task<IReadOnlyList<string>> GetAdminPermissionCodesAsync(Guid adminUserId, CancellationToken cancellationToken = default)
     {
-        var roleIds = _dbContext.AdminUserRoles
+        var roleIds = DbContext.AdminUserRoles
             .Where(x => x.AdminUserId == adminUserId)
             .Select(x => x.RoleId);
 
-        return await _dbContext.RolePermissions
+        return await DbContext.RolePermissions
             .Where(x => roleIds.Contains(x.RoleId))
-            .Join(_dbContext.Permissions, rolePermission => rolePermission.PermissionId, permission => permission.Id, (_, permission) => permission.Code)
+            .Join(DbContext.Permissions, rolePermission => rolePermission.PermissionId, permission => permission.Id, (_, permission) => permission.Code)
             .Distinct()
             .ToListAsync(cancellationToken);
     }
@@ -50,7 +49,7 @@ public class IdentityRepository : IIdentityRepository
     {
         var pageIndex = reqDto.GetSafePageIndex();
         var pageSize = reqDto.GetSafePageSize();
-        var query = _dbContext.AdminUsers.OrderByDescending(x => x.CreatedAt);
+        var query = DbContext.AdminUsers.OrderByDescending(x => x.CreatedAt);
 
         return new PageResDto<AdminUser>
         {
@@ -66,13 +65,13 @@ public class IdentityRepository : IIdentityRepository
     /// </summary>
     public async Task AddAdminUserAsync(AdminUser adminUser, IReadOnlyCollection<Guid> roleIds, CancellationToken cancellationToken = default)
     {
-        await _dbContext.AdminUsers.AddAsync(adminUser, cancellationToken);
-        await _dbContext.AdminUserRoles.AddRangeAsync(roleIds.Select(roleId => new AdminUserRole
+        await AddAsync(adminUser, cancellationToken);
+        await DbContext.AdminUserRoles.AddRangeAsync(roleIds.Select(roleId => new AdminUserRole
         {
             AdminUserId = adminUser.Id,
             RoleId = roleId
         }), cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await DbContext.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
@@ -80,10 +79,10 @@ public class IdentityRepository : IIdentityRepository
     /// </summary>
     public async Task DisableAdminUserAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var adminUser = await _dbContext.AdminUsers.FirstOrDefaultAsync(x => x.Id == id, cancellationToken) ??
+        var adminUser = await GetByIdAsync(id, cancellationToken) ??
                         throw new InvalidOperationException("管理员不存在。");
         adminUser.Status = AdminUserStatusEnum.Disabled;
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await DbContext.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
@@ -91,7 +90,7 @@ public class IdentityRepository : IIdentityRepository
     /// </summary>
     public async Task<IReadOnlyList<Role>> GetRolesAsync(CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Roles.OrderBy(x => x.Code).ToListAsync(cancellationToken);
+        return await DbContext.Roles.OrderBy(x => x.Code).ToListAsync(cancellationToken);
     }
 
     /// <summary>
@@ -99,10 +98,10 @@ public class IdentityRepository : IIdentityRepository
     /// </summary>
     public async Task<Role> SaveRoleAsync(Role role, CancellationToken cancellationToken = default)
     {
-        var existing = await _dbContext.Roles.FirstOrDefaultAsync(x => x.Id == role.Id, cancellationToken);
+        var existing = await DbContext.Roles.FirstOrDefaultAsync(x => x.Id == role.Id, cancellationToken);
         if (existing is null)
         {
-            await _dbContext.Roles.AddAsync(role, cancellationToken);
+            await DbContext.Roles.AddAsync(role, cancellationToken);
         }
         else
         {
@@ -111,7 +110,7 @@ public class IdentityRepository : IIdentityRepository
             role = existing;
         }
 
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await DbContext.SaveChangesAsync(cancellationToken);
         return role;
     }
 
@@ -120,7 +119,7 @@ public class IdentityRepository : IIdentityRepository
     /// </summary>
     public async Task<IReadOnlyList<Permission>> GetPermissionsAsync(CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Permissions.OrderBy(x => x.Module).ThenBy(x => x.Code).ToListAsync(cancellationToken);
+        return await DbContext.Permissions.OrderBy(x => x.Module).ThenBy(x => x.Code).ToListAsync(cancellationToken);
     }
 
     /// <summary>
@@ -128,7 +127,7 @@ public class IdentityRepository : IIdentityRepository
     /// </summary>
     public async Task<IReadOnlyList<Menu>> GetMenusAsync(CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Menus
+        return await DbContext.Menus
             .Include(x => x.Permission)
             .OrderBy(x => x.Sort)
             .ThenBy(x => x.Code)
@@ -140,14 +139,14 @@ public class IdentityRepository : IIdentityRepository
     /// </summary>
     public async Task<IReadOnlyList<Menu>> GetAdminMenusAsync(Guid adminUserId, CancellationToken cancellationToken = default)
     {
-        var roleIds = _dbContext.AdminUserRoles
+        var roleIds = DbContext.AdminUserRoles
             .Where(x => x.AdminUserId == adminUserId)
             .Select(x => x.RoleId);
-        var permissionIds = _dbContext.RolePermissions
+        var permissionIds = DbContext.RolePermissions
             .Where(x => roleIds.Contains(x.RoleId))
             .Select(x => x.PermissionId);
 
-        return await _dbContext.Menus
+        return await DbContext.Menus
             .Include(x => x.Permission)
             .Where(x => x.IsEnabled && x.IsVisible && (x.PermissionId == null || permissionIds.Contains(x.PermissionId.Value)))
             .OrderBy(x => x.Sort)
@@ -160,10 +159,10 @@ public class IdentityRepository : IIdentityRepository
     /// </summary>
     public async Task<Menu> SaveMenuAsync(Menu menu, CancellationToken cancellationToken = default)
     {
-        var existing = await _dbContext.Menus.FirstOrDefaultAsync(x => x.Id == menu.Id, cancellationToken);
+        var existing = await DbContext.Menus.FirstOrDefaultAsync(x => x.Id == menu.Id, cancellationToken);
         if (existing is null)
         {
-            await _dbContext.Menus.AddAsync(menu, cancellationToken);
+            await DbContext.Menus.AddAsync(menu, cancellationToken);
         }
         else
         {
@@ -181,7 +180,7 @@ public class IdentityRepository : IIdentityRepository
             menu = existing;
         }
 
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await DbContext.SaveChangesAsync(cancellationToken);
         return menu;
     }
 
@@ -190,14 +189,14 @@ public class IdentityRepository : IIdentityRepository
     /// </summary>
     public async Task BindRolePermissionsAsync(Guid roleId, IReadOnlyCollection<Guid> permissionIds, CancellationToken cancellationToken = default)
     {
-        var oldItems = _dbContext.RolePermissions.Where(x => x.RoleId == roleId);
-        _dbContext.RolePermissions.RemoveRange(oldItems);
-        await _dbContext.RolePermissions.AddRangeAsync(permissionIds.Distinct().Select(permissionId => new RolePermission
+        var oldItems = DbContext.RolePermissions.Where(x => x.RoleId == roleId);
+        DbContext.RolePermissions.RemoveRange(oldItems);
+        await DbContext.RolePermissions.AddRangeAsync(permissionIds.Distinct().Select(permissionId => new RolePermission
         {
             RoleId = roleId,
             PermissionId = permissionId
         }), cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await DbContext.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
@@ -205,7 +204,7 @@ public class IdentityRepository : IIdentityRepository
     /// </summary>
     public async Task<MemberIdentity?> GetMemberIdentityByOpenIdAsync(string openId, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.MemberIdentities.FirstOrDefaultAsync(x => x.OpenId == openId, cancellationToken);
+        return await DbContext.MemberIdentities.FirstOrDefaultAsync(x => x.OpenId == openId, cancellationToken);
     }
 
     /// <summary>
@@ -213,8 +212,8 @@ public class IdentityRepository : IIdentityRepository
     /// </summary>
     public async Task SaveMemberIdentityAsync(MemberIdentity memberIdentity, CancellationToken cancellationToken = default)
     {
-        await _dbContext.MemberIdentities.AddAsync(memberIdentity, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await DbContext.MemberIdentities.AddAsync(memberIdentity, cancellationToken);
+        await DbContext.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
@@ -222,8 +221,8 @@ public class IdentityRepository : IIdentityRepository
     /// </summary>
     public async Task SaveRefreshTokenAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default)
     {
-        await _dbContext.RefreshTokens.AddAsync(refreshToken, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await DbContext.RefreshTokens.AddAsync(refreshToken, cancellationToken);
+        await DbContext.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
@@ -231,7 +230,7 @@ public class IdentityRepository : IIdentityRepository
     /// </summary>
     public async Task<RefreshToken?> GetRefreshTokenAsync(string token, string scope, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.RefreshTokens.FirstOrDefaultAsync(x =>
+        return await DbContext.RefreshTokens.FirstOrDefaultAsync(x =>
             x.Token == token &&
             x.Scope == scope &&
             x.RevokedAt == null &&
@@ -243,7 +242,7 @@ public class IdentityRepository : IIdentityRepository
     /// </summary>
     public async Task RevokeRefreshTokenAsync(string token, string scope, CancellationToken cancellationToken = default)
     {
-        var refreshToken = await _dbContext.RefreshTokens.FirstOrDefaultAsync(x =>
+        var refreshToken = await DbContext.RefreshTokens.FirstOrDefaultAsync(x =>
             x.Token == token &&
             x.Scope == scope &&
             x.RevokedAt == null, cancellationToken);
@@ -254,7 +253,7 @@ public class IdentityRepository : IIdentityRepository
         }
 
         refreshToken.RevokedAt = DateTime.UtcNow;
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await DbContext.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
@@ -262,7 +261,7 @@ public class IdentityRepository : IIdentityRepository
     /// </summary>
     public async Task AddLoginLogAsync(LoginLog loginLog, CancellationToken cancellationToken = default)
     {
-        await _dbContext.LoginLogs.AddAsync(loginLog, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await DbContext.LoginLogs.AddAsync(loginLog, cancellationToken);
+        await DbContext.SaveChangesAsync(cancellationToken);
     }
 }

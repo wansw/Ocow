@@ -10,7 +10,8 @@ using Ocow.Shared.SwaggerApi;
 namespace Ocow.Order.Api.Controllers.Internal;
 
 /// <summary>
-/// 内部订单同步接口，用。Scheduler、ERP 等内部服务调用。/// </summary>
+/// 内部订单同步接口，用。Scheduler、ERP 等内部服务调用
+/// </summary>
 [ApiExplorerSettings(GroupName = SwaggerApiGroupNames.Internal)]
 [Route("internal/orders/sync")]
 [Authorize(Policy = InternalAuthServiceCollectionExtensions.InternalOnlyPolicy)]
@@ -20,14 +21,16 @@ public class InternalOrderSyncController : BaseController
     private readonly IOrderAppService _orderAppService;
 
     /// <summary>
-    /// 创建内部订单同步 Controller。    /// </summary>
+    /// 创建内部订单同步 Controller。    
+    /// </summary>
     public InternalOrderSyncController(IOrderAppService orderAppService)
     {
         _orderAppService = orderAppService;
     }
 
     /// <summary>
-    /// 同步 ERP 订单数据。    /// </summary>
+    /// 同步 ERP 订单数据。    
+    /// </summary>
     [HttpPost("erp")]
     public async Task<ApiResDto<int>> SyncErpAsync([FromBody] SyncErpOrdersReqDto reqDto, CancellationToken cancellationToken)
     {

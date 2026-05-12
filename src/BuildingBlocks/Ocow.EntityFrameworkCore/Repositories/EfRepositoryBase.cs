@@ -1,50 +1,59 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Ocow.EntityFrameworkCore.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ocow.EntityFrameworkCore.Repositories;
 
 /// <summary>
-/// EF Core 仓储基类，用于提供常用实体读写能力
+/// EF Core 仓储基类，用于提供常用实体读写能力。
 /// </summary>
-public abstract class EfRepositoryBase<TEntity, TKey>
-    where TEntity : class, IEntity<TKey>
+public abstract class EfRepositoryBase<TDbContext, TEntity, TKey>
+    where TDbContext : DbContext
+    where TEntity : class
 {
-    private readonly DbContext _dbContext;
-
-    protected EfRepositoryBase(DbContext dbContext)
+    protected EfRepositoryBase(TDbContext dbContext)
     {
-        _dbContext = dbContext;
+        DbContext = dbContext;
+        DbSet = dbContext.Set<TEntity>();
     }
 
     /// <summary>
-    /// 新增实体。    
+    /// 当前仓储使用的数据库上下文。
     /// </summary>
-    public async Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
+    protected TDbContext DbContext { get; }
+
+    /// <summary>
+    /// 当前仓储对应的实体集合。
+    /// </summary>
+    protected DbSet<TEntity> DbSet { get; }
+
+    /// <summary>
+    /// 新增实体。
+    /// </summary>
+    public virtual async Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
-        await _dbContext.Set<TEntity>().AddAsync(entity, cancellationToken);
+        await DbSet.AddAsync(entity, cancellationToken);
     }
 
     /// <summary>
-    /// 根据主键查询实体。    
+    /// 根据主键查询实体。
     /// </summary>
-    public async Task<TEntity?> GetByIdAsync(TKey id, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntity?> GetByIdAsync(TKey id, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Set<TEntity>().FindAsync(new object?[] { id }, cancellationToken);
+        return await DbSet.FindAsync(new object?[] { id }, cancellationToken);
     }
 
     /// <summary>
-    /// 删除实体。    
+    /// 标记实体为已修改。
     /// </summary>
-    public void Remove(TEntity entity)
+    public virtual void Update(TEntity entity)
     {
-        _dbContext.Set<TEntity>().Remove(entity);
+        DbSet.Update(entity);
     }
 
     /// <summary>
-    /// 保存当前仓储变更。    
+    /// 删除实体。
     /// </summary>
-    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    public virtual void Remove(TEntity entity)
     {
-        return await _dbContext.SaveChangesAsync(cancellationToken);
+        DbSet.Remove(entity);
     }
 }

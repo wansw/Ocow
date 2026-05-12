@@ -1,3 +1,4 @@
+using Ocow.EntityFrameworkCore.Abstractions;
 using Ocow.Order.Application.Dtos;
 using Ocow.Order.Application.Interfaces;
 using Ocow.Order.Domain.Models;
@@ -12,13 +13,15 @@ namespace Ocow.Order.Application.Services;
 public class OrderAppService : IOrderAppService
 {
     private readonly IOrderRepository _orderRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     /// <summary>
     /// 创建订单应用服务。
     /// </summary>
-    public OrderAppService(IOrderRepository orderRepository)
+    public OrderAppService(IOrderRepository orderRepository, IUnitOfWork unitOfWork)
     {
         _orderRepository = orderRepository;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -53,7 +56,7 @@ public class OrderAppService : IOrderAppService
         }
 
         await _orderRepository.AddAsync(order, cancellationToken);
-        await _orderRepository.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return MapToResDto(order);
     }
@@ -94,7 +97,7 @@ public class OrderAppService : IOrderAppService
                     throw new InvalidOperationException("订单不存在。");
 
         order.Cancel();
-        await _orderRepository.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return MapToResDto(order);
     }
@@ -126,7 +129,7 @@ public class OrderAppService : IOrderAppService
                     throw new InvalidOperationException("订单不存在。");
 
         order.Ship(reqDto.ExpressCompany, reqDto.ExpressNo);
-        await _orderRepository.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return MapToResDto(order);
     }
