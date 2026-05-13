@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Services\Order\Ocow.Order.Application\Ocow.Order.Application.csproj" />
     <ProjectReference Include="..\..\src\Services\Order\Ocow.Order.Domain\Ocow.Order.Domain.csproj" />
+    <ProjectReference Include="..\..\src\BuildingBlocks\Ocow.Observability\Ocow.Observability.csproj" />
     <ProjectReference Include="..\..\src\BuildingBlocks\Ocow.Shared\Ocow.Shared.csproj" />
     <ProjectReference Include="..\..\src\Services\Identity\Ocow.Identity.Application\Ocow.Identity.Application.csproj" />
     <ProjectReference Include="..\..\src\Services\Identity\Ocow.Identity.Domain\Ocow.Identity.Domain.csproj" />

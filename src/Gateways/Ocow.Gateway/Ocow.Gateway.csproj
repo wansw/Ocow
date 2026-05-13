@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\BuildingBlocks\Ocow.Observability\Ocow.Observability.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\Ocow.Redis\Ocow.Redis.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\Ocow.Shared\Ocow.Shared.csproj" />
   </ItemGroup>
