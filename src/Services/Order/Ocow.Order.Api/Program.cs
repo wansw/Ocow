@@ -1,5 +1,6 @@
 using Ocow.Auth.Extensions;
 using Ocow.AspNetCore.Extensions;
+using Ocow.Cache.Extensions;
 using Ocow.HealthChecks.Extensions;
 using Ocow.InternalAuth.Extensions;
 using Ocow.Observability.Extensions;
@@ -20,6 +21,7 @@ builder.Services.AddOcowHealthChecks(builder.Configuration, "Ocow.Order.Api", ch
     checks.AddRedisCheck(builder.Configuration);
 });
 builder.Services.AddOcowRedis(builder.Configuration);
+builder.Services.AddOcowCache(builder.Configuration);
 builder.Services.AddOrderApplication();
 builder.Services.AddOrderInfrastructure(builder.Configuration);
 builder.Services.AddOcowAuth(builder.Configuration);

@@ -16,11 +16,6 @@ public class RedisOption
     public string KeyPrefix { get; init; } = "ocow";
 
     /// <summary>
-    /// 默认缓存过期秒数。
-    /// </summary>
-    public int DefaultExpireSeconds { get; init; } = 300;
-
-    /// <summary>
     /// 默认 Redis 数据库编号，为空时使用连接字符串中的配置。
     /// </summary>
     public int? DefaultDatabase { get; init; }

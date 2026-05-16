@@ -1,8 +1,8 @@
+using Ocow.Cache.Interfaces;
 using Ocow.Identity.Application.Interfaces;
 using Ocow.Identity.Application.Models;
 using Ocow.Auth.Constants;
 using Ocow.Auth.Models;
-using Ocow.Redis.Interfaces;
 
 namespace Ocow.Identity.Application.Services;
 
@@ -11,14 +11,14 @@ namespace Ocow.Identity.Application.Services;
 /// </summary>
 public class RedisTokenSessionService : IRedisTokenSessionService
 {
-    private readonly IRedisCacheService _redisCacheService;
+    private readonly ICacheService _cacheService;
 
     /// <summary>
     /// 创建 Token 会话服务。
     /// </summary>
-    public RedisTokenSessionService(IRedisCacheService redisCacheService)
+    public RedisTokenSessionService(ICacheService cacheService)
     {
-        _redisCacheService = redisCacheService;
+        _cacheService = cacheService;
     }
 
     /// <summary>
@@ -26,7 +26,7 @@ public class RedisTokenSessionService : IRedisTokenSessionService
     /// </summary>
     public async Task SaveAdminSessionAsync(TokenSession session, CancellationToken cancellationToken = default)
     {
-        await _redisCacheService.SetAsync(AdminTokenSessionRedisKeys.GetSessionKey(session.SessionId), session, GetExpire(session.ExpiresAt), cancellationToken);
+        await _cacheService.SetAsync(AdminTokenSessionRedisKeys.GetSessionKey(session.SessionId), session, GetExpire(session.ExpiresAt), cancellationToken);
     }
 
     /// <summary>
@@ -34,7 +34,7 @@ public class RedisTokenSessionService : IRedisTokenSessionService
     /// </summary>
     public async Task SaveAdminRefreshTokenAsync(string refreshToken, RefreshTokenSession session, CancellationToken cancellationToken = default)
     {
-        await _redisCacheService.SetAsync(AdminTokenSessionRedisKeys.GetRefreshKey(refreshToken), session, GetExpire(session.RefreshTokenExpiresAt), cancellationToken);
+        await _cacheService.SetAsync(AdminTokenSessionRedisKeys.GetRefreshKey(refreshToken), session, GetExpire(session.RefreshTokenExpiresAt), cancellationToken);
     }
 
     /// <summary>
@@ -42,7 +42,7 @@ public class RedisTokenSessionService : IRedisTokenSessionService
     /// </summary>
     public async Task<RefreshTokenSession?> GetAdminRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default)
     {
-        return await _redisCacheService.GetAsync<RefreshTokenSession>(AdminTokenSessionRedisKeys.GetRefreshKey(refreshToken), cancellationToken);
+        return await _cacheService.GetAsync<RefreshTokenSession>(AdminTokenSessionRedisKeys.GetRefreshKey(refreshToken), cancellationToken);
     }
 
     /// <summary>
@@ -50,7 +50,7 @@ public class RedisTokenSessionService : IRedisTokenSessionService
     /// </summary>
     public async Task RemoveAdminRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default)
     {
-        await _redisCacheService.RemoveAsync(AdminTokenSessionRedisKeys.GetRefreshKey(refreshToken), cancellationToken);
+        await _cacheService.RemoveAsync(AdminTokenSessionRedisKeys.GetRefreshKey(refreshToken), cancellationToken);
     }
 
     /// <summary>
@@ -58,8 +58,8 @@ public class RedisTokenSessionService : IRedisTokenSessionService
     /// </summary>
     public async Task RevokeAdminSessionAsync(Guid sessionId, string jwtId, DateTime expiresAt, CancellationToken cancellationToken = default)
     {
-        await _redisCacheService.RemoveAsync(AdminTokenSessionRedisKeys.GetSessionKey(sessionId), cancellationToken);
-        await _redisCacheService.SetStringAsync(AdminTokenSessionRedisKeys.GetBlacklistKey(jwtId), "1", GetExpire(expiresAt), cancellationToken);
+        await _cacheService.RemoveAsync(AdminTokenSessionRedisKeys.GetSessionKey(sessionId), cancellationToken);
+        await _cacheService.SetStringAsync(AdminTokenSessionRedisKeys.GetBlacklistKey(jwtId), "1", GetExpire(expiresAt), cancellationToken);
     }
 
     /// <summary>

@@ -14,7 +14,7 @@ public class AdminLoginReqDto
     public string UserName { get; init; }
 
     /// <summary>
-    /// 管理员登录密码。    
+    /// 管理员登录密码。     Admin@123456 / admin
     /// </summary>
     [DefaultValue("Admin@123456")]
     public string Password { get; init; }

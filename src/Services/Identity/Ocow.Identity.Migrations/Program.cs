@@ -12,13 +12,13 @@ namespace Ocow.Identity.Migrations;
 public static class Program
 {
     private const string ServiceName = "IDENTITY";
-    private const string DefaultConnectionString = "Host=localhost;Port=5432;Database=ocow_identity;Username=postgres;Password=postgres123";
+    private static string DefaultConnectionString = "Host=localhost;Port=5432;Database=ocow_identity_dev;Username=postgres;Password=postgres123";
 
     /// <summary>
     /// 执行身份服务数据库初始化命令。
     /// </summary>
     public static async Task<int> Main(string[] args)
-    {
+    { 
         try
         {
             if (args.Contains("--help", StringComparer.OrdinalIgnoreCase))
@@ -29,7 +29,15 @@ public static class Program
 
             if (!args.Contains("init", StringComparer.OrdinalIgnoreCase))
             {
+                Console.WriteLine("请输入 --init");
                 return 0;
+            }
+
+            Console.WriteLine("--init开始-----------------");
+
+            if (args.Contains("env=pro", StringComparer.OrdinalIgnoreCase))
+            {
+                DefaultConnectionString = "Host=localhost;Port=5432;Database=ocow_identity;Username=postgres;Password=postgres123";
             }
 
             await using var dbContext = CreateDbContext();

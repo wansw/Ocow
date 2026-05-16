@@ -3,7 +3,7 @@ using System.Security.Claims;
 using Ocow.Auth.Constants;
 using Ocow.Auth.Interfaces;
 using Ocow.Auth.Models;
-using Ocow.Redis.Interfaces;
+using Ocow.Cache.Interfaces;
 
 namespace Ocow.Auth.Services;
 
@@ -14,14 +14,14 @@ public class RedisAdminTokenSessionValidator : IAdminTokenSessionValidator
 {
     private const string AdminScope = "admin";
 
-    private readonly IRedisCacheService _redisCacheService;
+    private readonly ICacheService _cacheService;
 
     /// <summary>
     /// 创建 Redis Admin Token 会话校验器。
     /// </summary>
-    public RedisAdminTokenSessionValidator(IRedisCacheService redisCacheService)
+    public RedisAdminTokenSessionValidator(ICacheService cacheService)
     {
-        _redisCacheService = redisCacheService;
+        _cacheService = cacheService;
     }
 
     /// <summary>
@@ -46,12 +46,12 @@ public class RedisAdminTokenSessionValidator : IAdminTokenSessionValidator
             return false;
         }
 
-        if (await _redisCacheService.ExistsAsync(AdminTokenSessionRedisKeys.GetBlacklistKey(jwtId), cancellationToken))
+        if (await _cacheService.ExistsAsync(AdminTokenSessionRedisKeys.GetBlacklistKey(jwtId), cancellationToken))
         {
             return false;
         }
 
-        var session = await _redisCacheService.GetAsync<TokenSession>(AdminTokenSessionRedisKeys.GetSessionKey(sessionId), cancellationToken);
+        var session = await _cacheService.GetAsync<TokenSession>(AdminTokenSessionRedisKeys.GetSessionKey(sessionId), cancellationToken);
         return session is not null &&
                session.SubjectId == subjectId &&
                session.SessionId == sessionId &&

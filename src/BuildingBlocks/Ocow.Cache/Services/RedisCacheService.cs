@@ -1,23 +1,24 @@
 using System.Text.Json;
 using Microsoft.Extensions.Options;
-using Ocow.Redis.Interfaces;
-using Ocow.Redis.Options;
+using Ocow.Cache.Constants;
+using Ocow.Cache.Interfaces;
+using Ocow.Cache.Options;
 using StackExchange.Redis;
 
-namespace Ocow.Redis.Services;
+namespace Ocow.Cache.Services;
 
 /// <summary>
 /// Redis 缓存服务实现，用于操作字符串缓存和 JSON 对象缓存。
 /// </summary>
-public class RedisCacheService : IRedisCacheService
+public class RedisCacheService : ICacheService
 {
     private readonly IConnectionMultiplexer _connectionMultiplexer;
-    private readonly RedisOption _option;
+    private readonly CacheOption _option;
 
     /// <summary>
     /// 创建 Redis 缓存服务。
     /// </summary>
-    public RedisCacheService(IConnectionMultiplexer connectionMultiplexer, IOptions<RedisOption> option)
+    public RedisCacheService(IConnectionMultiplexer connectionMultiplexer, IOptions<CacheOption> option)
     {
         _connectionMultiplexer = connectionMultiplexer;
         _option = option.Value;
@@ -105,7 +106,7 @@ public class RedisCacheService : IRedisCacheService
     /// </summary>
     private IDatabase GetDatabase()
     {
-        return _connectionMultiplexer.GetDatabase(_option.DefaultDatabase ?? -1);
+        return _connectionMultiplexer.GetDatabase();
     }
 
     /// <summary>
@@ -113,9 +114,7 @@ public class RedisCacheService : IRedisCacheService
     /// </summary>
     private string BuildKey(string key)
     {
-        var prefix = _option.KeyPrefix.Trim(':');
-        var normalizedKey = key.TrimStart(':');
-        return string.IsNullOrWhiteSpace(prefix) ? normalizedKey : $"{prefix}:{normalizedKey}";
+        return CacheKeys.Build(_option.KeyPrefix, key);
     }
 
     /// <summary>

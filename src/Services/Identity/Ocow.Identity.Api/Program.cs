@@ -1,5 +1,6 @@
 using Ocow.Auth.Extensions;
 using Ocow.AspNetCore.Extensions;
+using Ocow.Cache.Extensions;
 using Ocow.HealthChecks.Extensions;
 using Ocow.Identity.Application.Extensions;
 using Ocow.Identity.Infrastructure.Extensions;
@@ -22,6 +23,7 @@ builder.Services.AddOcowHealthChecks(builder.Configuration, "Ocow.Identity.Api",
 });
 
 builder.Services.AddOcowRedis(builder.Configuration);
+builder.Services.AddOcowCache(builder.Configuration);
 builder.Services.AddIdentityApplication(builder.Configuration);
 builder.Services.AddIdentityInfrastructure(builder.Configuration);
 builder.Services.AddOcowAuth(builder.Configuration);

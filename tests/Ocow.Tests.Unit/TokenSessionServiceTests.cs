@@ -1,10 +1,10 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Ocow.Cache.Interfaces;
 using Ocow.Identity.Application.Services;
 using Ocow.Auth.Interfaces;
 using Ocow.Auth.Models;
 using Ocow.Auth.Services;
-using Ocow.Redis.Interfaces;
 
 namespace Ocow.Tests.Unit;
 
@@ -19,9 +19,9 @@ public class TokenSessionServiceTests
     [Fact]
     public async Task ValidateAdminToken_WhenSessionExists_ShouldReturnTrue()
     {
-        var redis = new FakeRedisCacheService();
-        var sessionService = new RedisTokenSessionService(redis);
-        IAdminTokenSessionValidator validator = new RedisAdminTokenSessionValidator(redis);
+        var cache = new FakeCacheService();
+        var sessionService = new RedisTokenSessionService(cache);
+        IAdminTokenSessionValidator validator = new RedisAdminTokenSessionValidator(cache);
         var subjectId = Guid.NewGuid();
         var sessionId = Guid.NewGuid();
         const string jwtId = "jwt-1";
@@ -46,9 +46,9 @@ public class TokenSessionServiceTests
     [Fact]
     public async Task ValidateAdminToken_WhenJwtBlacklisted_ShouldReturnFalse()
     {
-        var redis = new FakeRedisCacheService();
-        var sessionService = new RedisTokenSessionService(redis);
-        IAdminTokenSessionValidator validator = new RedisAdminTokenSessionValidator(redis);
+        var cache = new FakeCacheService();
+        var sessionService = new RedisTokenSessionService(cache);
+        IAdminTokenSessionValidator validator = new RedisAdminTokenSessionValidator(cache);
         var subjectId = Guid.NewGuid();
         var sessionId = Guid.NewGuid();
         const string jwtId = "jwt-2";
@@ -82,7 +82,7 @@ public class TokenSessionServiceTests
         }, "test"));
     }
 
-    private class FakeRedisCacheService : IRedisCacheService
+    private class FakeCacheService : ICacheService
     {
         private readonly Dictionary<string, string> _strings = new();
         private readonly Dictionary<string, object> _objects = new();

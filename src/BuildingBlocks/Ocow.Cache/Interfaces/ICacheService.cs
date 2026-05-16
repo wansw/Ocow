@@ -1,9 +1,9 @@
-namespace Ocow.Redis.Interfaces;
+namespace Ocow.Cache.Interfaces;
 
 /// <summary>
-/// Redis 缓存服务接口，用于封装缓存读写、删除和过期时间控制。
+/// 缓存服务接口，用于封装缓存读写、删除和过期时间控制。
 /// </summary>
-public interface IRedisCacheService
+public interface ICacheService
 {
     /// <summary>
     /// 写入字符串缓存。
