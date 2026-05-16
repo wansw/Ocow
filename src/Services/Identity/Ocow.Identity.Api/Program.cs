@@ -14,7 +14,13 @@ builder.AddOcowObservability();
 builder.Services.AddControllers();
 builder.Services.AddOcowValidDtoResponse();
 builder.Services.AddOcowSwagger(builder.Configuration);
-builder.Services.AddOcowHealthChecks(builder.Configuration, "Ocow.Identity.Api");
+
+builder.Services.AddOcowHealthChecks(builder.Configuration, "Ocow.Identity.Api", checks =>
+{
+    checks.AddPostgreSqlCheck(builder.Configuration);
+    checks.AddRedisCheck(builder.Configuration);
+});
+
 builder.Services.AddOcowRedis(builder.Configuration);
 builder.Services.AddIdentityApplication(builder.Configuration);
 builder.Services.AddIdentityInfrastructure(builder.Configuration);

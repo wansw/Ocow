@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using Ocow.HealthChecks.Constants;
 using Ocow.HealthChecks.Dtos;
 using Ocow.HealthChecks.Options;
 
@@ -31,7 +32,7 @@ public static class HealthChecksEndpointRouteBuilderExtensions
             .WithGroupName(HealthSwaggerGroupName)
             .WithSummary("服务存活检查");
 
-        endpoints.MapGet(NormalizePath(option.ReadyPath), CreateHealthResponseAsync)
+        endpoints.MapGet(NormalizePath(option.ReadyPath), CreateReadyResponseAsync)
             .WithGroupName(HealthSwaggerGroupName)
             .WithSummary("服务就绪检查");
 
@@ -46,7 +47,34 @@ public static class HealthChecksEndpointRouteBuilderExtensions
         IOptions<HealthCheckOption> options,
         HttpContext context)
     {
-        var report = await healthCheckService.CheckHealthAsync(context.RequestAborted);
+        return await CreateReportResponseAsync(healthCheckService, options, context, null);
+    }
+
+    /// <summary>
+    /// 创建就绪检查响应。
+    /// </summary>
+    private static async Task<IResult> CreateReadyResponseAsync(
+        HealthCheckService healthCheckService,
+        IOptions<HealthCheckOption> options,
+        HttpContext context)
+    {
+        return await CreateReportResponseAsync(
+            healthCheckService,
+            options,
+            context,
+            registration => registration.Tags.Contains(HealthCheckTags.Ready));
+    }
+
+    /// <summary>
+    /// 创建指定检查范围的健康检查响应。
+    /// </summary>
+    private static async Task<IResult> CreateReportResponseAsync(
+        HealthCheckService healthCheckService,
+        IOptions<HealthCheckOption> options,
+        HttpContext context,
+        Func<HealthCheckRegistration, bool>? predicate)
+    {
+        var report = await healthCheckService.CheckHealthAsync(predicate, context.RequestAborted);
         var response = new HealthCheckResDto
         {
             Service = options.Value.ServiceName,

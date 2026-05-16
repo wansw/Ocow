@@ -14,7 +14,11 @@ builder.AddOcowObservability();
 builder.Services.AddControllers();
 builder.Services.AddOcowValidDtoResponse();
 builder.Services.AddOcowSwagger(builder.Configuration);
-builder.Services.AddOcowHealthChecks(builder.Configuration, "Ocow.Order.Api");
+builder.Services.AddOcowHealthChecks(builder.Configuration, "Ocow.Order.Api", checks =>
+{
+    checks.AddPostgreSqlCheck(builder.Configuration);
+    checks.AddRedisCheck(builder.Configuration);
+});
 builder.Services.AddOcowRedis(builder.Configuration);
 builder.Services.AddOrderApplication();
 builder.Services.AddOrderInfrastructure(builder.Configuration);

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Ocow.HealthChecks.Options;
 
 namespace Ocow.HealthChecks.Extensions;
@@ -14,6 +15,18 @@ public static class HealthChecksServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddOcowHealthChecks(this IServiceCollection services, IConfiguration configuration, string serviceName)
     {
+        return services.AddOcowHealthChecks(configuration, serviceName, null);
+    }
+
+    /// <summary>
+    /// 注册 Ocow 健康检查服务，并允许业务服务追加 ready 依赖检查。
+    /// </summary>
+    public static IServiceCollection AddOcowHealthChecks(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        string serviceName,
+        Action<IHealthChecksBuilder>? configureChecks)
+    {
         services.Configure<HealthCheckOption>(configuration.GetSection("HealthChecks"));
         services.PostConfigure<HealthCheckOption>(option =>
         {
@@ -23,7 +36,9 @@ public static class HealthChecksServiceCollectionExtensions
             }
         });
 
-        services.AddHealthChecks();
+        var builder = services.AddHealthChecks();
+        configureChecks?.Invoke(builder);
+
         return services;
     }
 }
