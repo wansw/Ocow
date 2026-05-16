@@ -1,10 +1,11 @@
+using Ocow.Auth.Extensions;
+using Ocow.AspNetCore.Extensions;
+using Ocow.HealthChecks.Extensions;
 using Ocow.Identity.Application.Extensions;
 using Ocow.Identity.Infrastructure.Extensions;
 using Ocow.InternalAuth.Extensions;
 using Ocow.Observability.Extensions;
 using Ocow.Redis.Extensions;
-using Ocow.Shared.Extensions;
-using Ocow.Shared.SwaggerApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,10 +14,12 @@ builder.AddOcowObservability();
 builder.Services.AddControllers();
 builder.Services.AddOcowValidDtoResponse();
 builder.Services.AddOcowSwagger(builder.Configuration);
+builder.Services.AddOcowHealthChecks(builder.Configuration, "Ocow.Identity.Api");
 builder.Services.AddOcowRedis(builder.Configuration);
 builder.Services.AddIdentityApplication(builder.Configuration);
 builder.Services.AddIdentityInfrastructure(builder.Configuration);
-builder.Services.AddOcowJwtAuthorization(builder.Configuration);
+builder.Services.AddOcowAuth(builder.Configuration);
+builder.Services.AddOcowInternalAuth(builder.Configuration);  //引用这个有用吗
 
 var app = builder.Build();
 
@@ -29,9 +32,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.MapGet("/health", () => Results.Ok(new { service = "Ocow.Identity.Api", status = "ok" }))
-    .WithGroupName(SwaggerApiGroupNames.Health)
-    .WithSummary("身份服务健康检查");
+app.MapOcowHealthChecks();
 
 app.Run();

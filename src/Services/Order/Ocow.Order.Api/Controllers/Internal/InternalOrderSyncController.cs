@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Ocow.AspNetCore.Controllers;
+using Ocow.AspNetCore.SwaggerApi;
 using Ocow.InternalAuth.Extensions;
 using Ocow.Order.Application.Dtos;
 using Ocow.Order.Application.Interfaces;
-using Ocow.Shared.Controllers;
 using Ocow.Shared.Dtos;
-using Ocow.Shared.SwaggerApi;
 
 namespace Ocow.Order.Api.Controllers.Internal;
 

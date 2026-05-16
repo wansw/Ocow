@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ocow.InternalAuth.Extensions;
+using Ocow.Auth.Extensions;
 using Ocow.Order.Application.Dtos;
 using Ocow.Order.Application.Interfaces;
-using Ocow.Shared.Controllers;
+using Ocow.AspNetCore.Controllers;
 using Ocow.Shared.Dtos;
-using Ocow.Shared.SwaggerApi;
 
 namespace Ocow.Order.Api.Controllers.Client;
 
@@ -13,11 +12,9 @@ namespace Ocow.Order.Api.Controllers.Client;
 /// 小程序订单接口，用于会员下单、查询和取消订单。
 /// </summary>
 
-[ApiExplorerSettings(GroupName = SwaggerApiGroupNames.Client)]
 [Route("api/orders")]
-[Authorize(Policy = InternalAuthServiceCollectionExtensions.CustomerOnlyPolicy)]
 [Tags("小程序订单")]
-public class OrdersController : BaseController
+public class OrdersController : ClientController
 {
     private readonly IOrderAppService _orderAppService;
 

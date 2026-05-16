@@ -1,5 +1,5 @@
 using Ocow.Identity.Application.Models;
-using Ocow.InternalAuth.Models;
+using Ocow.Auth.Models;
 
 namespace Ocow.Identity.Application.Interfaces;
 

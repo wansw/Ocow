@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Ocow.Observability.Middleware;
+using Ocow.Observability.Options;
 
 namespace Ocow.Observability.Extensions;
 
@@ -13,6 +16,12 @@ public static class RequestTraceApplicationBuilderExtensions
     /// </summary>
     public static IApplicationBuilder UseOcowRequestTrace(this IApplicationBuilder app)
     {
+        var option = app.ApplicationServices.GetRequiredService<IOptions<ObservabilityOption>>().Value;
+        if (!option.EnableRequestTrace)
+        {
+            return app;
+        }
+
         return app.UseMiddleware<RequestTraceMiddleware>();
     }
 }

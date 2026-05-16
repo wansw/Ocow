@@ -2,22 +2,19 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ocow.Identity.Application.Dtos;
 using Ocow.Identity.Application.Interfaces;
-using Ocow.InternalAuth.Attributes;
-using Ocow.InternalAuth.Extensions;
-using Ocow.Shared.Controllers;
+using Ocow.Auth.Attributes;
+using Ocow.Auth.Extensions;
+using Ocow.AspNetCore.Controllers;
 using Ocow.Shared.Dtos;
-using Ocow.Shared.SwaggerApi;
 
 namespace Ocow.Identity.Api.Controllers.Admin;
 
 /// <summary>
 /// 后台角色接口，用于管理 RBAC 角色和角色权限点绑定。
 /// </summary>
-[ApiExplorerSettings(GroupName = SwaggerApiGroupNames.Admin)]
 [Route("api/admin/roles")]
-[Authorize(Policy = InternalAuthServiceCollectionExtensions.AdminOnlyPolicy)]
 [Tags("后台角色")]
-public class AdminRolesController : BaseController
+public class AdminRolesController : AdminController
 {
     private readonly IRolePermissionAppService _rolePermissionAppService;
 

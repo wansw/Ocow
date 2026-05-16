@@ -2,22 +2,19 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ocow.Identity.Application.Dtos;
 using Ocow.Identity.Application.Interfaces;
-using Ocow.InternalAuth.Attributes;
-using Ocow.InternalAuth.Extensions;
-using Ocow.Shared.Controllers;
+using Ocow.Auth.Attributes;
+using Ocow.Auth.Extensions;
+using Ocow.AspNetCore.Controllers;
 using Ocow.Shared.Dtos;
-using Ocow.Shared.SwaggerApi;
 
 namespace Ocow.Identity.Api.Controllers.Admin;
 
 /// <summary>
 /// 后台管理员接口，用于管理管理员账号。
 /// </summary>
-[ApiExplorerSettings(GroupName = SwaggerApiGroupNames.Admin)]
 [Route("api/admin/users")]
-[Authorize(Policy = InternalAuthServiceCollectionExtensions.AdminOnlyPolicy)]
 [Tags("后台管理员")]
-public class AdminUsersController : BaseController
+public class AdminUsersController : AdminController
 {
     private readonly IAdminUserAppService _adminUserAppService;
 

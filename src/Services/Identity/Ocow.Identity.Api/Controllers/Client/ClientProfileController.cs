@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ocow.InternalAuth.Extensions;
+using Ocow.Auth.Extensions;
 using Ocow.Identity.Application.Dtos;
-using Ocow.Shared.Controllers;
+using Ocow.AspNetCore.Controllers;
 using Ocow.Shared.Dtos;
-using Ocow.Shared.SwaggerApi;
 
 namespace Ocow.Identity.Api.Controllers.Client;
 
@@ -12,11 +11,9 @@ namespace Ocow.Identity.Api.Controllers.Client;
 /// 小程序当前身份接口，用于查询当前登录会员身份
 /// </summary>
 
-[ApiExplorerSettings(GroupName = SwaggerApiGroupNames.Client)]
 [Route("api/auth")]
-[Authorize(Policy = InternalAuthServiceCollectionExtensions.CustomerOnlyPolicy)]
 [Tags("小程序身份")]
-public class ClientProfileController : BaseController
+public class ClientProfileController : ClientController
 {
     /// <summary>
     /// 查询当前小程序用户身份。    

@@ -427,7 +427,7 @@ Redis Key 规范
 如果后期缓存能力变复杂，可以再拆：
 
 ``` text
-Ocow.Caching
+Ocow.Cache
 ```
 
 当前阶段直接放在 `Ocow.Redis` 里也可以。

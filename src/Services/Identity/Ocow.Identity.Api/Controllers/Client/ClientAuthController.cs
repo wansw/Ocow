@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Ocow.Identity.Application.Dtos;
 using Ocow.Identity.Application.Interfaces;
-using Ocow.Shared.Controllers;
+using Ocow.AspNetCore.Controllers;
 using Ocow.Shared.Dtos;
-using Ocow.Shared.SwaggerApi;
+using Ocow.AspNetCore.SwaggerApi;
 
 namespace Ocow.Identity.Api.Controllers.Client;
 

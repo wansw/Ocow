@@ -5,7 +5,7 @@ using Ocow.Identity.Application.Interfaces;
 using Ocow.Identity.Application.Models;
 using Ocow.Identity.Domain.Enums;
 using Ocow.Identity.Domain.Models;
-using Ocow.InternalAuth.Models;
+using Ocow.Auth.Models;
 
 namespace Ocow.Identity.Application.Services;
 

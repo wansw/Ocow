@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Ocow.Observability.Options;
 using Serilog;
 using Serilog.Events;
 
@@ -15,6 +18,13 @@ public static class SerilogRequestLoggingApplicationBuilderExtensions
     /// </summary>
     public static IApplicationBuilder UseOcowSerilogRequestLogging(this IApplicationBuilder app)
     {
+        var option = app.ApplicationServices.GetRequiredService<IOptions<ObservabilityOption>>().Value;
+        if (!option.Logging.EnableRequestLogging)
+        {
+            return app;
+        }
+
+       
         return app.UseSerilogRequestLogging(options =>
         {
             options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";

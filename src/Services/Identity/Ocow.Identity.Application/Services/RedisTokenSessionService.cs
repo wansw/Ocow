@@ -1,7 +1,7 @@
 using Ocow.Identity.Application.Interfaces;
 using Ocow.Identity.Application.Models;
-using Ocow.InternalAuth.Constants;
-using Ocow.InternalAuth.Models;
+using Ocow.Auth.Constants;
+using Ocow.Auth.Models;
 using Ocow.Redis.Interfaces;
 
 namespace Ocow.Identity.Application.Services;

@@ -1,9 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Ocow.Identity.Application.Services;
-using Ocow.InternalAuth.Interfaces;
-using Ocow.InternalAuth.Models;
-using Ocow.InternalAuth.Services;
+using Ocow.Auth.Interfaces;
+using Ocow.Auth.Models;
+using Ocow.Auth.Services;
 using Ocow.Redis.Interfaces;
 
 namespace Ocow.Tests.Unit;

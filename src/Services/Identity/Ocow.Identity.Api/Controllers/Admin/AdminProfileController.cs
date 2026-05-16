@@ -3,21 +3,18 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ocow.Identity.Application.Dtos;
 using Ocow.Identity.Application.Interfaces;
-using Ocow.InternalAuth.Extensions;
-using Ocow.Shared.Controllers;
+using Ocow.Auth.Extensions;
+using Ocow.AspNetCore.Controllers;
 using Ocow.Shared.Dtos;
-using Ocow.Shared.SwaggerApi;
 
 namespace Ocow.Identity.Api.Controllers.Admin;
 
 /// <summary>
 /// 后台个人接口，用于查询当前登录管理员的菜单和权限相关信息。
 /// </summary>
-[ApiExplorerSettings(GroupName = SwaggerApiGroupNames.Admin)]
 [Route("api/admin/profile")]
-[Authorize(Policy = InternalAuthServiceCollectionExtensions.AdminOnlyPolicy)]
 [Tags("后台个人信息")]
-public class AdminProfileController : BaseController
+public class AdminProfileController : AdminController
 {
     private readonly IRolePermissionAppService _rolePermissionAppService;
 

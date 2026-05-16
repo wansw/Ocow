@@ -8,14 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Ocow.Order.Application\Ocow.Order.Application.csproj" />
     <ProjectReference Include="..\Ocow.Order.Infrastructure\Ocow.Order.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.AspNetCore\Ocow.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.HealthChecks\Ocow.HealthChecks.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.Observability\Ocow.Observability.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.Shared\Ocow.Shared.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.Auth\Ocow.Auth.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.InternalAuth\Ocow.InternalAuth.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.Redis\Ocow.Redis.csproj" />
   </ItemGroup>

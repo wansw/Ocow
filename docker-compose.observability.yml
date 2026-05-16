@@ -1,0 +1,54 @@
+services:
+  # OpenTelemetry Collector
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:${OTEL_COLLECTOR_VERSION:-0.131.0}
+    container_name: otel-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "4317:4317"    # OTLP gRPC receiver
+      - "4318:4318"    # OTLP HTTP receiver
+    depends_on:
+      - loki
+    networks:
+      - observability
+
+  # Loki - 日志存储
+  loki:
+    image: grafana/loki:${LOKI_VERSION:-3.5.0}
+    container_name: loki
+    ports:
+      - "3100:3100"    # Loki API
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+      - loki-data:/loki
+    networks:
+      - observability
+
+  # Grafana - 可视化
+  grafana:
+    image: grafana/grafana:${GRAFANA_VERSION:-12.0.0}
+    container_name: grafana
+    ports:
+      - "3000:3000"    # Grafana UI
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    depends_on:
+      - loki
+    networks:
+      - observability
+
+volumes:
+  loki-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+networks:
+  observability:
+    driver: bridge

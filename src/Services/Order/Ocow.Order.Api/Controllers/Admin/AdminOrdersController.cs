@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ocow.InternalAuth.Extensions;
+using Ocow.Auth.Attributes;
+using Ocow.Auth.Extensions;
 using Ocow.Order.Application.Dtos;
 using Ocow.Order.Application.Interfaces;
-using Ocow.Shared.Controllers;
+using Ocow.AspNetCore.Controllers;
 using Ocow.Shared.Dtos; 
-using Ocow.Shared.SwaggerApi;
 
 namespace Ocow.Order.Api.Controllers.Admin;
 
@@ -13,11 +13,9 @@ namespace Ocow.Order.Api.Controllers.Admin;
 /// 后台订单接口，用于管理端查询订单和执行发货。
 /// </summary>
 
-[ApiExplorerSettings(GroupName = SwaggerApiGroupNames.Admin)]
 [Route("api/admin/orders")]
-[Authorize(Policy = InternalAuthServiceCollectionExtensions.AdminOnlyPolicy)]
 [Tags("后台订单")]
-public class AdminOrdersController : BaseController
+public class AdminOrdersController : AdminController
 {
     private readonly IOrderAppService _orderAppService;
 
@@ -57,7 +55,7 @@ public class AdminOrdersController : BaseController
     /// <summary>
     /// 后台执行订单发货。
     /// </summary>
-    [Authorize(Policy = InternalAuthServiceCollectionExtensions.OrderShipPolicy)]
+    [PermissionAuthorize("order.ship")]
     [HttpPut("{id:guid}/ship")]
     public async Task<ApiResDto<OrderResDto>> ShipAsync(Guid id, [FromBody] ShipOrderReqDto reqDto, CancellationToken cancellationToken)
     {

@@ -6,7 +6,7 @@ using Ocow.Identity.Application.Models;
 using Ocow.Identity.Application.Options;
 using Ocow.Identity.Application.Services;
 using Ocow.Identity.Domain.Models;
-using Ocow.InternalAuth.Models;
+using Ocow.Auth.Models;
 using Ocow.Shared.Dtos;
 
 namespace Ocow.Tests.Unit;
