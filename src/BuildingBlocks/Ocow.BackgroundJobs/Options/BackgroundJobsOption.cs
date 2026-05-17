@@ -23,6 +23,16 @@ public class BackgroundJobsOption
     public string DashboardPermissionCode { get; set; } = HangfireDashboardAdminAuthorizer.DefaultPermissionCode;
 
     /// <summary>
+    /// Hangfire Dashboard 浏览器会话 Cookie 名称。
+    /// </summary>
+    public string DashboardCookieName { get; set; } = "Ocow.HangfireDashboard";
+
+    /// <summary>
+    /// Hangfire Dashboard 浏览器会话有效分钟数。
+    /// </summary>
+    public int DashboardCookieExpireMinutes { get; set; } = 30;
+
+    /// <summary>
     /// Hangfire PostgreSQL 存储连接字符串。
     /// </summary>
     public string StorageConnectionString { get; set; } = string.Empty;

@@ -21,6 +21,8 @@ public class BackgroundJobsBoundaryTests
 
         Assert.Equal("/hangfire", option.DashboardPath);
         Assert.Equal("scheduler.trigger", option.DashboardPermissionCode);
+        Assert.Equal("Ocow.HangfireDashboard", option.DashboardCookieName);
+        Assert.Equal(30, option.DashboardCookieExpireMinutes);
     }
 
     /// <summary>

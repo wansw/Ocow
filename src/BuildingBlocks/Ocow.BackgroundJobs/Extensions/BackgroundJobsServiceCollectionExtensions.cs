@@ -1,8 +1,11 @@
 using Hangfire;
 using Hangfire.PostgreSql;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Ocow.BackgroundJobs.Authorization;
 using Ocow.BackgroundJobs.Jobs;
 using Ocow.BackgroundJobs.Options;
 
@@ -41,6 +44,30 @@ public static class BackgroundJobsServiceCollectionExtensions
         {
             throw new InvalidOperationException("请配置 BackgroundJobs:StorageConnectionString、ConnectionStrings:Hangfire 或 Database:ConnectionString。");
         }
+
+        services.AddAuthentication()
+            .AddCookie(BackgroundJobsAuthenticationSchemes.DashboardCookie, options =>
+            {
+                options.Cookie.Name = backgroundJobsOption.DashboardCookieName;
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SameSite = SameSiteMode.Lax;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(Math.Max(1, backgroundJobsOption.DashboardCookieExpireMinutes));
+                options.SlidingExpiration = true;
+                options.Events = new CookieAuthenticationEvents
+                {
+                    OnRedirectToLogin = context =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        return Task.CompletedTask;
+                    },
+                    OnRedirectToAccessDenied = context =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        return Task.CompletedTask;
+                    }
+                };
+            });
 
         services.AddHangfire(hangfire =>
         {

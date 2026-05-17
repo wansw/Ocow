@@ -1,8 +1,10 @@
 using Hangfire;
 using Hangfire.Dashboard;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Ocow.Auth.Extensions;
 using Ocow.BackgroundJobs.Authorization;
 using Ocow.BackgroundJobs.Options;
 
@@ -19,6 +21,26 @@ public static class BackgroundJobsApplicationBuilderExtensions
     public static IApplicationBuilder UseOcowHangfireDashboard(this IApplicationBuilder app)
     {
         var option = app.ApplicationServices.GetRequiredService<IOptions<BackgroundJobsOption>>().Value;
+        app.UseWhen(
+            context => context.Request.Path.StartsWithSegments(option.DashboardPath),
+            branch =>
+            {
+                branch.Use(async (context, next) =>
+                {
+                    var result = await context.AuthenticateAsync(BackgroundJobsAuthenticationSchemes.DashboardCookie);
+                    if (!result.Succeeded)
+                    {
+                        result = await context.AuthenticateAsync(AuthServiceCollectionExtensions.AdminJwtScheme);
+                    }
+
+                    if (result.Succeeded && result.Principal is not null)
+                    {
+                        context.User = result.Principal;
+                    }
+
+                    await next();
+                });
+            });
 
         return app.UseHangfireDashboard(option.DashboardPath, new DashboardOptions
         {
