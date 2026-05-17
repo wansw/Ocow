@@ -1,12 +1,16 @@
 using Ocow.Auth.Extensions;
 using Ocow.AspNetCore.Extensions;
 using Ocow.Cache.Extensions;
+using Ocow.Contracts.Events.Orders;
 using Ocow.HealthChecks.Extensions;
 using Ocow.InternalAuth.Extensions;
 using Ocow.Observability.Extensions;
+using Ocow.Order.Api.EventSubscribers;
 using Ocow.Order.Application.Extensions;
+using Ocow.Order.Infrastructure.EventHandlers;
 using Ocow.Order.Infrastructure.Extensions;
 using Ocow.Redis.Extensions;
+using Ocow.EventBus.RabbitMq.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +30,9 @@ builder.Services.AddOrderApplication();
 builder.Services.AddOrderInfrastructure(builder.Configuration);
 builder.Services.AddOcowAuth(builder.Configuration);
 builder.Services.AddOcowInternalAuth(builder.Configuration);
+builder.Services.AddOcowCapRabbitMqEventBus(builder.Configuration);
+builder.Services.AddIntegrationEventHandler<OrderCreatedIntegrationEvent, OrderCreatedIntegrationEventHandler>();
+builder.Services.AddTransient<OrderCreatedIntegrationEventSubscriber>();
 
 var app = builder.Build();
 

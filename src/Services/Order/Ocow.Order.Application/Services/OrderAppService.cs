@@ -13,14 +13,19 @@ namespace Ocow.Order.Application.Services;
 public class OrderAppService : IOrderAppService
 {
     private readonly IOrderRepository _orderRepository;
+    private readonly IOrderCreationTransaction _orderCreationTransaction;
     private readonly IUnitOfWork _unitOfWork;
 
     /// <summary>
     /// 创建订单应用服务。
     /// </summary>
-    public OrderAppService(IOrderRepository orderRepository, IUnitOfWork unitOfWork)
+    public OrderAppService(
+        IOrderRepository orderRepository,
+        IOrderCreationTransaction orderCreationTransaction,
+        IUnitOfWork unitOfWork)
     {
         _orderRepository = orderRepository;
+        _orderCreationTransaction = orderCreationTransaction;
         _unitOfWork = unitOfWork;
     }
 
@@ -55,8 +60,7 @@ public class OrderAppService : IOrderAppService
             item.OrderId = order.Id;
         }
 
-        await _orderRepository.AddAsync(order, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _orderCreationTransaction.CreateAsync(order, cancellationToken);
 
         return MapToResDto(order);
     }

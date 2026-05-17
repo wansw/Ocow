@@ -23,7 +23,7 @@ public class JobsBoundaryTests
             .OfType<AuthorizeAttribute>()
             .Single();
 
-        Assert.Equal(AuthServiceCollectionExtensions.AdminOnlyPolicy, authorize.Policy);
+         Assert.Equal(AuthServiceCollectionExtensions.AdminOnlyPolicy, authorize.Policy);
     }
 
     /// <summary>

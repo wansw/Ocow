@@ -6,6 +6,7 @@ using Ocow.EntityFrameworkCore.Options;
 using Ocow.Order.Application.Interfaces;
 using Ocow.Order.Infrastructure.Data;
 using Ocow.Order.Infrastructure.Repositories;
+using Ocow.Order.Infrastructure.Services;
 
 namespace Ocow.Order.Infrastructure.Extensions;
 
@@ -31,6 +32,7 @@ public static class OrderInfrastructureServiceCollectionExtensions
         services.AddOcowDbContext<OrderDbContext>(configuration, repos =>
         {
             repos.AddScoped<IOrderRepository, OrderRepository>();
+            repos.AddScoped<IOrderCreationTransaction, CapOrderCreationTransaction>();
         });
 
         return services;

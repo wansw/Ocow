@@ -15,6 +15,8 @@
     <ProjectReference Include="..\Ocow.Order.Domain\Ocow.Order.Domain.csproj" />
     <ProjectReference Include="..\Ocow.Order.Application\Ocow.Order.Application.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.EntityFrameworkCore\Ocow.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.EventBus.Abstractions\Ocow.EventBus.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.EventBus.RabbitMq\Ocow.EventBus.RabbitMq.csproj" />
   </ItemGroup>
 
 </Project>

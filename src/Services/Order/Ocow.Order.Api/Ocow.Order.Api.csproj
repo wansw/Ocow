@@ -18,6 +18,7 @@
     <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.InternalAuth\Ocow.InternalAuth.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.Cache\Ocow.Cache.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.Redis\Ocow.Redis.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.EventBus.RabbitMq\Ocow.EventBus.RabbitMq.csproj" />
   </ItemGroup>
 
 </Project>
