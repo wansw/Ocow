@@ -24,4 +24,9 @@ public class GatewayRoutePolicyOption
     /// ASP.NET Core 授权策略名称。
     /// </summary>
     public string? AuthorizationPolicy { get; init; }
+
+    /// <summary>
+    /// 是否在转发到下游前把外部用户 JWT 替换为网关内部用户 JWT。
+    /// </summary>
+    public bool ForwardUserIdentity { get; init; }
 }

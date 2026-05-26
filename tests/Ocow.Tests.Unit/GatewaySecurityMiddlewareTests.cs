@@ -1,9 +1,11 @@
 using System.Net;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Ocow.Gateway.Middleware;
 using Ocow.Gateway.Options;
+using Ocow.Gateway.Services;
 using Ocow.Redis.Interfaces;
 using Ocow.Redis.Models;
 
@@ -163,10 +165,46 @@ public class GatewaySecurityMiddlewareTests
         Assert.False(context.Items.ContainsKey("next"));
     }
 
+    /// <summary>
+    /// 验证用户路由认证通过后会把客户端 JWT 替换成网关内部转发 JWT。
+    /// </summary>
+    [Fact]
+    public async Task InvokeAsync_WhenForwardUserIdentityEnabled_ShouldReplaceAuthorizationHeader()
+    {
+        var authorizer = new FakeGatewayRouteAuthorizer(GatewayRouteAuthorizationResult.Authorized())
+        {
+            Principal = new ClaimsPrincipal(new ClaimsIdentity(
+            [
+                new Claim("scope", "client"),
+                new Claim(ClaimTypes.NameIdentifier, "customer-1")
+            ], "CustomerJwt"))
+        };
+        var tokenService = new FakeGatewayForwardedUserTokenService("gateway-forwarded-token");
+        var middleware = CreateMiddleware(CreateOption(routes:
+        [
+            new GatewayRoutePolicyOption
+            {
+                PathPrefix = "/api/orders",
+                AuthenticationScheme = "CustomerJwt",
+                AuthorizationPolicy = "CustomerOnly",
+                ForwardUserIdentity = true
+            }
+        ]), authorizer: authorizer, tokenService: tokenService);
+        var context = CreateContext("/api/orders", "10.0.0.8");
+        context.Request.Headers.Authorization = "Bearer external-client-token";
+
+        await middleware.InvokeAsync(context);
+
+        Assert.Equal(StatusCodes.Status200OK, context.Response.StatusCode);
+        Assert.Equal("Bearer gateway-forwarded-token", context.Request.Headers.Authorization.ToString());
+        Assert.Equal(1, tokenService.CallCount);
+    }
+
     private static GatewaySecurityMiddleware CreateMiddleware(
         GatewaySecurityOption option,
         IRedisRateLimiter? limiter = null,
-        IGatewayRouteAuthorizer? authorizer = null)
+        IGatewayRouteAuthorizer? authorizer = null,
+        IGatewayForwardedUserTokenService? tokenService = null)
     {
         return new GatewaySecurityMiddleware(
             async context =>
@@ -184,6 +222,7 @@ public class GatewaySecurityMiddlewareTests
                 Remaining = 99
             }),
             authorizer ?? new FakeGatewayRouteAuthorizer(GatewayRouteAuthorizationResult.Authorized()),
+            tokenService ?? new FakeGatewayForwardedUserTokenService("gateway-forwarded-token"),
             NullLogger<GatewaySecurityMiddleware>.Instance);
     }
 
@@ -223,6 +262,8 @@ public class GatewaySecurityMiddlewareTests
 
         public int CallCount { get; private set; }
 
+        public ClaimsPrincipal? Principal { get; init; }
+
         /// <summary>
         /// 创建测试用网关路由授权器。
         /// </summary>
@@ -240,7 +281,36 @@ public class GatewaySecurityMiddlewareTests
             CancellationToken cancellationToken = default)
         {
             CallCount++;
+            if (Principal is not null)
+            {
+                context.User = Principal;
+            }
+
             return Task.FromResult(_result);
+        }
+    }
+
+    private sealed class FakeGatewayForwardedUserTokenService : IGatewayForwardedUserTokenService
+    {
+        private readonly string _token;
+
+        public int CallCount { get; private set; }
+
+        /// <summary>
+        /// 创建测试用网关用户转发 Token 服务。
+        /// </summary>
+        public FakeGatewayForwardedUserTokenService(string token)
+        {
+            _token = token;
+        }
+
+        /// <summary>
+        /// 返回预设的网关内部转发 Token。
+        /// </summary>
+        public string CreateToken(ClaimsPrincipal principal)
+        {
+            CallCount++;
+            return _token;
         }
     }
 

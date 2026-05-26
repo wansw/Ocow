@@ -18,6 +18,7 @@ public static class AuthServiceCollectionExtensions
 {
     public const string CustomerJwtScheme = "CustomerJwt";
     public const string AdminJwtScheme = "AdminJwt";
+    public const string GatewayUserJwtScheme = "GatewayUserJwt";
 
     public const string CustomerOnlyPolicy = "CustomerOnly";
     public const string AdminOnlyPolicy = "AdminOnly";
@@ -28,16 +29,18 @@ public static class AuthServiceCollectionExtensions
     public static IServiceCollection AddOcowAuth(this IServiceCollection services, IConfiguration configuration)
     {
         var identityOption = configuration.GetSection("Jwt").Get<IdentityJwtOption>() ?? new IdentityJwtOption();
+        var gatewayOption = configuration.GetSection("GatewayForwardedJwt").Get<GatewayForwardedJwtOption>() ?? new GatewayForwardedJwtOption();
 
         services.Configure<IdentityJwtOption>(configuration.GetSection("Jwt"));
+        services.Configure<GatewayForwardedJwtOption>(configuration.GetSection("GatewayForwardedJwt"));
         services.AddScoped<IAdminTokenSessionValidator, RedisAdminTokenSessionValidator>();
         services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
         services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
-        services.AddAuthentication(options =>
+        var authenticationBuilder = services.AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme = CustomerJwtScheme;
-                options.DefaultChallengeScheme = CustomerJwtScheme;
+                options.DefaultAuthenticateScheme = gatewayOption.Enabled ? GatewayUserJwtScheme : CustomerJwtScheme;
+                options.DefaultChallengeScheme = gatewayOption.Enabled ? GatewayUserJwtScheme : CustomerJwtScheme;
             })
             .AddJwtBearer(CustomerJwtScheme, options => ConfigureJwt(options, identityOption.Issuer, identityOption.Audience, identityOption.Secret))
             .AddJwtBearer(AdminJwtScheme, options =>
@@ -49,10 +52,15 @@ public static class AuthServiceCollectionExtensions
                 };
             });
 
+        if (gatewayOption.Enabled)
+        {
+            authenticationBuilder.AddJwtBearer(GatewayUserJwtScheme, options => ConfigureJwt(options, gatewayOption.Issuer, gatewayOption.Audience, gatewayOption.Secret));
+        }
+
         services.AddAuthorization(options =>
         {
-            options.AddPolicy(CustomerOnlyPolicy, policy => RequireScope(policy, CustomerJwtScheme, "client"));
-            options.AddPolicy(AdminOnlyPolicy, policy => RequireScope(policy, AdminJwtScheme, "admin"));
+            options.AddPolicy(CustomerOnlyPolicy, policy => RequireScope(policy, GetCustomerSchemes(gatewayOption), "client"));
+            options.AddPolicy(AdminOnlyPolicy, policy => RequireScope(policy, GetAdminSchemes(gatewayOption), "admin"));
         });
 
         return services;
@@ -101,8 +109,50 @@ public static class AuthServiceCollectionExtensions
     /// </summary>
     private static void RequireScope(AuthorizationPolicyBuilder policy, string scheme, string scope)
     {
-        policy.AuthenticationSchemes.Add(scheme);
+        RequireScope(policy, [scheme], scope);
+    }
+
+    /// <summary>
+    /// 配置指定认证方案集合的 scope 要求。
+    /// </summary>
+    private static void RequireScope(AuthorizationPolicyBuilder policy, IEnumerable<string> schemes, string scope)
+    {
+        foreach (var scheme in schemes)
+        {
+            policy.AuthenticationSchemes.Add(scheme);
+        }
+
         policy.RequireAuthenticatedUser();
         policy.RequireClaim("scope", scope);
+    }
+
+    /// <summary>
+    /// 获取客户接口可接受的认证方案集合。
+    /// </summary>
+    internal static IReadOnlyList<string> GetCustomerSchemes(GatewayForwardedJwtOption option)
+    {
+        if (!option.Enabled)
+        {
+            return [CustomerJwtScheme];
+        }
+
+        return option.AllowDirectIdentityJwt
+            ? [GatewayUserJwtScheme, CustomerJwtScheme]
+            : [GatewayUserJwtScheme];
+    }
+
+    /// <summary>
+    /// 获取后台接口可接受的认证方案集合。
+    /// </summary>
+    internal static IReadOnlyList<string> GetAdminSchemes(GatewayForwardedJwtOption option)
+    {
+        if (!option.Enabled)
+        {
+            return [AdminJwtScheme];
+        }
+
+        return option.AllowDirectIdentityJwt
+            ? [GatewayUserJwtScheme, AdminJwtScheme]
+            : [GatewayUserJwtScheme];
     }
 }

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ocow.Gateway.Options;
+using Ocow.Gateway.Services;
 using Ocow.Redis.Interfaces;
 
 namespace Ocow.Gateway.Middleware;
@@ -15,6 +16,7 @@ public sealed class GatewaySecurityMiddleware
     private readonly GatewaySecurityOption _option;
     private readonly IRedisRateLimiter _rateLimiter;
     private readonly IGatewayRouteAuthorizer _authorizer;
+    private readonly IGatewayForwardedUserTokenService _tokenService;
     private readonly ILogger<GatewaySecurityMiddleware> _logger;
 
     /// <summary>
@@ -25,12 +27,14 @@ public sealed class GatewaySecurityMiddleware
         IOptions<GatewaySecurityOption> option,
         IRedisRateLimiter rateLimiter,
         IGatewayRouteAuthorizer authorizer,
+        IGatewayForwardedUserTokenService tokenService,
         ILogger<GatewaySecurityMiddleware> logger)
     {
         _next = next;
         _option = option.Value;
         _rateLimiter = rateLimiter;
         _authorizer = authorizer;
+        _tokenService = tokenService;
         _logger = logger;
     }
 
@@ -99,6 +103,13 @@ public sealed class GatewaySecurityMiddleware
             _logger.LogInformation("Gateway rejected unauthorized request for {Path}", context.Request.Path);
             context.Response.StatusCode = StatusCodes.Status403Forbidden;
             return;
+        }
+
+        if (routePolicy.ForwardUserIdentity)
+        {
+            var token = _tokenService.CreateToken(context.User);
+            context.Request.Headers.Authorization = $"Bearer {token}";
+            context.Request.Headers["X-Gateway-Forwarded-User"] = "true";
         }
 
         await _next(context);

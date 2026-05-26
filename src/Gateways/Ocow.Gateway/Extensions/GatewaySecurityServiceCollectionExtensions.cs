@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ocow.Gateway.Middleware;
 using Ocow.Gateway.Options;
+using Ocow.Gateway.Services;
 
 namespace Ocow.Gateway.Extensions;
 
@@ -17,6 +18,7 @@ public static class GatewaySecurityServiceCollectionExtensions
     {
         services.Configure<GatewaySecurityOption>(configuration.GetSection("GatewaySecurity"));
         services.AddSingleton<IGatewayRouteAuthorizer, GatewayRouteAuthorizer>();
+        services.AddSingleton<IGatewayForwardedUserTokenService, GatewayForwardedUserTokenService>();
         return services;
     }
 }

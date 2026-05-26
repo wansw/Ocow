@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using Ocow.Auth.Attributes;
 using Ocow.Auth.Extensions;
+using Ocow.Auth.Options;
 using Ocow.Auth.Requirements;
 
 namespace Ocow.Auth.Services;
@@ -11,12 +12,15 @@ namespace Ocow.Auth.Services;
 /// </summary>
 public class PermissionAuthorizationPolicyProvider : DefaultAuthorizationPolicyProvider
 {
+    private readonly GatewayForwardedJwtOption _gatewayOption;
+
     /// <summary>
     /// 创建权限点授权策略提供器。
     /// </summary>
-    public PermissionAuthorizationPolicyProvider(IOptions<AuthorizationOptions> options)
+    public PermissionAuthorizationPolicyProvider(IOptions<AuthorizationOptions> options, IOptions<GatewayForwardedJwtOption> gatewayOption)
         : base(options)
     {
+        _gatewayOption = gatewayOption.Value;
     }
 
     /// <summary>
@@ -30,7 +34,7 @@ public class PermissionAuthorizationPolicyProvider : DefaultAuthorizationPolicyP
         }
 
         var permissionCode = policyName[PermissionAuthorizeAttribute.PolicyPrefix.Length..];
-        return new AuthorizationPolicyBuilder(AuthServiceCollectionExtensions.AdminJwtScheme)
+        return new AuthorizationPolicyBuilder(AuthServiceCollectionExtensions.GetAdminSchemes(_gatewayOption).ToArray())
             .RequireAuthenticatedUser()
             .RequireClaim("scope", "admin")
             .AddRequirements(new PermissionRequirement(permissionCode))
