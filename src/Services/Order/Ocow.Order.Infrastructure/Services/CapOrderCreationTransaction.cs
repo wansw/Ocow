@@ -42,6 +42,17 @@ public sealed class CapOrderCreationTransaction : IOrderCreationTransaction
                         order.TotalAmount,
                         DefaultCurrency)
                     {
+                        CorrelationId = order.Id.ToString("N"),
+                        Items = order.Items
+                            .Select(x => new OrderCreatedIntegrationEventItem(x.ProductId, x.SkuId, x.Quantity))
+                            .ToList()
+                    },
+                    ct);
+
+                await eventBus.PublishDelayAsync(
+                    TimeSpan.FromMinutes(15),
+                    new OrderPaymentTimeoutIntegrationEvent(order.Id)
+                    {
                         CorrelationId = order.Id.ToString("N")
                     },
                     ct);

@@ -1,6 +1,7 @@
 using Ocow.Contracts.Abstractions;
 using Ocow.Contracts.Events.Orders;
 using Ocow.EventBus.Abstractions;
+using Ocow.EventBus.Abstractions.Interfaces;
 using Ocow.EventBus.Abstractions.Services;
 
 namespace Ocow.Tests.Unit
@@ -100,6 +101,20 @@ namespace Ocow.Tests.Unit
             Assert.DoesNotContain("RabbitMQ.Client", contractsProject);
             Assert.DoesNotContain("DotNetCore.CAP", abstractionsProject);
             Assert.DoesNotContain("RabbitMQ.Client", abstractionsProject);
+        }
+
+        /// <summary>
+        /// 验证事件总线抽象提供延迟发布能力，用于订单支付超时等场景。
+        /// </summary>
+        [Fact]
+        public void IEventBus_ShouldProvideDelayPublishMethods()
+        {
+            var methods = typeof(IEventBus)
+                .GetMethods()
+                .Where(x => x.Name == "PublishDelayAsync")
+                .ToArray();
+
+            Assert.Equal(2, methods.Length);
         }
 
         /// <summary>

@@ -25,6 +25,8 @@
     <ProjectReference Include="..\..\src\Services\Order\Ocow.Order.Application\Ocow.Order.Application.csproj" />
     <ProjectReference Include="..\..\src\Services\Order\Ocow.Order.Domain\Ocow.Order.Domain.csproj" />
     <ProjectReference Include="..\..\src\Services\Order\Ocow.Order.Infrastructure\Ocow.Order.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Services\Inventory\Ocow.Inventory.Domain\Ocow.Inventory.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Services\Inventory\Ocow.Inventory.Infrastructure\Ocow.Inventory.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\BuildingBlocks\Ocow.Observability\Ocow.Observability.csproj" />
     <ProjectReference Include="..\..\src\BuildingBlocks\Ocow.Shared\Ocow.Shared.csproj" />
     <ProjectReference Include="..\..\src\BuildingBlocks\Ocow.AspNetCore\Ocow.AspNetCore.csproj" />
@@ -35,12 +37,14 @@
     <ProjectReference Include="..\..\src\Services\Identity\Ocow.Identity.Application\Ocow.Identity.Application.csproj" />
     <ProjectReference Include="..\..\src\Services\Identity\Ocow.Identity.Domain\Ocow.Identity.Domain.csproj" />
     <ProjectReference Include="..\..\src\BuildingBlocks\Ocow.InternalAuth\Ocow.InternalAuth.csproj" />
+    <ProjectReference Include="..\..\src\BuildingBlocks\Ocow.ERP\Ocow.ERP.csproj" />
     <ProjectReference Include="..\..\src\BuildingBlocks\Ocow.EntityFrameworkCore\Ocow.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\..\src\BuildingBlocks\Ocow.EventBus.Abstractions\Ocow.EventBus.Abstractions.csproj" />
     <ProjectReference Include="..\..\src\BuildingBlocks\Ocow.EventBus.RabbitMq\Ocow.EventBus.RabbitMq.csproj" />
     <ProjectReference Include="..\..\src\Services\Identity\Ocow.Identity.Infrastructure\Ocow.Identity.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Services\Identity\Ocow.Identity.Migrations\Ocow.Identity.Migrations.csproj" />
     <ProjectReference Include="..\..\src\Services\Jobs\Ocow.Jobs\Ocow.Jobs.Api.csproj" />
+    <ProjectReference Include="..\..\src\Gateways\Ocow.Gateway\Ocow.Gateway.csproj" />
   </ItemGroup>
 
 </Project>

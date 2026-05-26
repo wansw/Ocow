@@ -8,6 +8,7 @@ using Ocow.BackgroundJobs.Authorization;
 using Ocow.BackgroundJobs.Jobs;
 using Ocow.BackgroundJobs.Options;
 using Ocow.Jobs.Api.Dtos;
+using Ocow.Jobs.Api.Interfaces;
 using Ocow.Shared.Dtos;
 
 namespace Ocow.Jobs.Api.Controllers.Admin;
@@ -25,7 +26,9 @@ public class AdminJobsController : AdminController
     /// <summary>
     /// 创建后台任务 Controller。
     /// </summary>
-    public AdminJobsController(IBackgroundJobClient backgroundJobClient, IOptions<BackgroundJobsOption> backgroundJobsOption)
+    public AdminJobsController(
+        IBackgroundJobClient backgroundJobClient,
+        IOptions<BackgroundJobsOption> backgroundJobsOption)
     {
         _backgroundJobClient = backgroundJobClient;
         _backgroundJobsOption = backgroundJobsOption.Value;
@@ -72,4 +75,6 @@ public class AdminJobsController : AdminController
 
         return Task.FromResult(Success(result));
     }
+
+
 }

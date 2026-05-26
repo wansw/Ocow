@@ -4,6 +4,7 @@
     <ProjectReference Include="..\Ocow.Order.Domain\Ocow.Order.Domain.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.Contracts\Ocow.Contracts.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.EntityFrameworkCore\Ocow.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.ERP\Ocow.ERP.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.Shared\Ocow.Shared.csproj" />
   </ItemGroup>
 

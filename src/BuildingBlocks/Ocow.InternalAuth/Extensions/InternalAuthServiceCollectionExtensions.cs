@@ -29,6 +29,8 @@ public static class InternalAuthServiceCollectionExtensions
         services.Configure<InternalAuthOption>(configuration.GetSection("InternalAuth"));
         services.Configure<HmacSignatureOption>(configuration.GetSection("HmacSignature"));
         services.AddSingleton<IHmacSignatureService, HmacSignatureService>();
+        services.AddSingleton<IInternalServiceTokenProvider, InternalServiceTokenProvider>();
+        services.AddTransient<InternalServiceAuthenticationHandler>();
 
         services.AddAuthentication()
             .AddJwtBearer(ServiceJwtScheme, options => ConfigureJwt(options, option.Issuer, option.Audience, option.Secret));
@@ -39,6 +41,14 @@ public static class InternalAuthServiceCollectionExtensions
         });
 
         return services;
+    }
+
+    /// <summary>
+    /// 为 HttpClient 注册内部服务自动认证处理器。
+    /// </summary>
+    public static IHttpClientBuilder AddOcowInternalServiceAuthentication(this IHttpClientBuilder builder)
+    {
+        return builder.AddHttpMessageHandler<InternalServiceAuthenticationHandler>();
     }
 
     /// <summary>

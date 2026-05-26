@@ -35,6 +35,9 @@ public class OrderDbContext : DbContext
                 .WithOne(x => x.Order)
                 .HasForeignKey(x => x.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(x => new { x.SourceSystem, x.ExternalOrderId })
+                .IsUnique();
         });
 
         modelBuilder.Entity<ProcessedIntegrationEvent>(entity =>

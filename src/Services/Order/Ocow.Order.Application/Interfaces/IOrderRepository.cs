@@ -18,6 +18,11 @@ public interface IOrderRepository
     Task<OrderEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// 按外部来源和外部订单编号查询订单，用于 ERP 同步幂等判断。
+    /// </summary>
+    Task<OrderEntity?> GetByExternalOrderAsync(string sourceSystem, string externalOrderId, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// 分页查询指定会员的订单。
     /// </summary>
     Task<(IReadOnlyList<OrderEntity> Items, long Total)> GetCustomerOrdersAsync(Guid customerId, int pageIndex, int pageSize, CancellationToken cancellationToken = default);

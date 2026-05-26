@@ -29,12 +29,13 @@ public class InternalOrderSyncController : BaseController
     }
 
     /// <summary>
-    /// 同步 ERP 订单数据。    
+    /// 同步 ERP 订单数据。     [FromBody] SyncErpOrdersReqDto reqDto,
     /// </summary>
     [HttpPost("erp")]
-    public async Task<ApiResDto<int>> SyncErpAsync([FromBody] SyncErpOrdersReqDto reqDto, CancellationToken cancellationToken)
+    public async Task<ApiResDto<SyncErpOrdersResDto>> SyncErpAsync(CancellationToken cancellationToken)
     {
-        var count = await _orderAppService.SyncErpOrdersAsync(reqDto, cancellationToken);
-        return Success(count);
+        SyncErpOrdersReqDto reqDto = new();
+        var result = await _orderAppService.SyncErpOrdersAsync(reqDto, cancellationToken);
+        return Success(result);
     }
 }

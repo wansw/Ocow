@@ -19,6 +19,7 @@
     <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.Cache\Ocow.Cache.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.Redis\Ocow.Redis.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.EventBus.RabbitMq\Ocow.EventBus.RabbitMq.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.ERP\Ocow.ERP.csproj" />
   </ItemGroup>
 
 </Project>

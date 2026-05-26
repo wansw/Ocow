@@ -23,6 +23,12 @@ public class Order
     [Column(TypeName = "decimal(18,2)")]
     public decimal TotalAmount { get; private set; }
 
+    [MaxLength(64)]
+    public string? SourceSystem { get; private set; }
+
+    [MaxLength(128)]
+    public string? ExternalOrderId { get; private set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime? CanceledAt { get; private set; }
@@ -53,6 +59,29 @@ public class Order
             Items = orderItems,
             TotalAmount = orderItems.Sum(x => x.UnitPrice * x.Quantity)
         };
+    }
+
+    /// <summary>
+    /// 从外部 ERP 订单创建内部订单，并记录外部幂等键。
+    /// </summary>
+    public static Order CreateFromExternal(
+        string sourceSystem,
+        string externalOrderId,
+        Guid customerId,
+        IEnumerable<OrderItem> items,
+        DateTime createdAt)
+    {
+        var order = Create(customerId, items);
+        order.SourceSystem = sourceSystem;
+        order.ExternalOrderId = externalOrderId;
+        order.CreatedAt = createdAt;
+
+        foreach (var item in order.Items)
+        {
+            item.OrderId = order.Id;
+        }
+
+        return order;
     }
 
     /// <summary>

@@ -41,8 +41,9 @@ internal class RabbitMqHealthCheck : IHealthCheck
                 RequestedConnectionTimeout = TimeSpan.FromSeconds(5)
             };
 
-            await using var connection = await factory.CreateConnectionAsync(cancellationToken);
-            await using var channel = await connection.CreateChannelAsync(null, cancellationToken);
+            using var connection = factory.CreateConnection();
+
+            using var channel = connection.CreateModel();
 
             return HealthCheckResult.Healthy("RabbitMQ 可用。");
         }

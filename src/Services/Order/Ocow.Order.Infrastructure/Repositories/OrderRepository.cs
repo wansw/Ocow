@@ -27,6 +27,16 @@ public class OrderRepository : EfRepositoryBase<OrderDbContext, OrderEntity, Gui
     }
 
     /// <summary>
+    /// 按外部来源和外部订单编号查询订单，用于 ERP 同步幂等判断。
+    /// </summary>
+    public async Task<OrderEntity?> GetByExternalOrderAsync(string sourceSystem, string externalOrderId, CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(x => x.Items)
+            .FirstOrDefaultAsync(x => x.SourceSystem == sourceSystem && x.ExternalOrderId == externalOrderId, cancellationToken);
+    }
+
+    /// <summary>
     /// 分页查询指定会员的订单。
     /// </summary>
     public async Task<(IReadOnlyList<OrderEntity> Items, long Total)> GetCustomerOrdersAsync(Guid customerId, int pageIndex, int pageSize, CancellationToken cancellationToken = default)

@@ -10,4 +10,18 @@ public sealed record OrderCreatedIntegrationEvent(
     Guid OrderId,
     Guid UserId,
     decimal TotalAmount,
-    string Currency) : IntegrationEvent;
+    string Currency) : IntegrationEvent
+{
+    /// <summary>
+    /// 订单商品明细，用于库存服务锁定库存。
+    /// </summary>
+    public IReadOnlyList<OrderCreatedIntegrationEventItem> Items { get; init; } = [];
+}
+
+/// <summary>
+/// 订单创建事件商品明细，用于传递库存锁定所需的商品和数量。
+/// </summary>
+public sealed record OrderCreatedIntegrationEventItem(
+    Guid ProductId,
+    Guid SkuId,
+    int Quantity);

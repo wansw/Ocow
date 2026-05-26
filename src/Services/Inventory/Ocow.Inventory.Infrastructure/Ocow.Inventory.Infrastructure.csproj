@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.*" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ocow.Inventory.Domain\Ocow.Inventory.Domain.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.Contracts\Ocow.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.EntityFrameworkCore\Ocow.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.EventBus.Abstractions\Ocow.EventBus.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.EventBus.RabbitMq\Ocow.EventBus.RabbitMq.csproj" />
+  </ItemGroup>
+
+</Project>

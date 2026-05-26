@@ -33,5 +33,5 @@ public interface IOrderAppService
 
     /// <summary>
     /// 同步 ERP 订单数据。    /// </summary>
-    Task<int> SyncErpOrdersAsync(SyncErpOrdersReqDto reqDto, CancellationToken cancellationToken = default);
+    Task<SyncErpOrdersResDto> SyncErpOrdersAsync(SyncErpOrdersReqDto reqDto, CancellationToken cancellationToken = default);
 }

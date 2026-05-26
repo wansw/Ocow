@@ -11,6 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\BuildingBlocks\Ocow.Auth\Ocow.Auth.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\Ocow.Cache\Ocow.Cache.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\Ocow.InternalAuth\Ocow.InternalAuth.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\Ocow.Observability\Ocow.Observability.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\Ocow.Redis\Ocow.Redis.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\Ocow.Shared\Ocow.Shared.csproj" />

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ocow.Inventory.Infrastructure\Ocow.Inventory.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.Contracts\Ocow.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.EventBus.RabbitMq\Ocow.EventBus.RabbitMq.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.HealthChecks\Ocow.HealthChecks.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.Observability\Ocow.Observability.csproj" />
+  </ItemGroup>
+
+</Project>

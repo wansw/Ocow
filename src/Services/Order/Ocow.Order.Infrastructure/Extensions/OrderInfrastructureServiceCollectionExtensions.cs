@@ -33,6 +33,7 @@ public static class OrderInfrastructureServiceCollectionExtensions
         {
             repos.AddScoped<IOrderRepository, OrderRepository>();
             repos.AddScoped<IOrderCreationTransaction, CapOrderCreationTransaction>();
+            repos.AddScoped<IOrderCancellationTransaction, CapOrderCancellationTransaction>();
         });
 
         return services;

@@ -18,4 +18,16 @@ public interface IEventBus
     /// </summary>
     Task PublishAsync<TEvent>(string eventName, TEvent integrationEvent, CancellationToken cancellationToken = default)
         where TEvent : IntegrationEvent;
+
+    /// <summary>
+    /// 按事件类型约定的事件名延迟发布集成事件。
+    /// </summary>
+    Task PublishDelayAsync<TEvent>(TimeSpan delay, TEvent integrationEvent, CancellationToken cancellationToken = default)
+        where TEvent : IntegrationEvent;
+
+    /// <summary>
+    /// 按显式事件名延迟发布集成事件。
+    /// </summary>
+    Task PublishDelayAsync<TEvent>(TimeSpan delay, string eventName, TEvent integrationEvent, CancellationToken cancellationToken = default)
+        where TEvent : IntegrationEvent;
 }

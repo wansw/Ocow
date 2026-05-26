@@ -1,0 +1,72 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Ocow.Contracts.Events.Orders;
+using Ocow.EventBus.Abstractions.Interfaces;
+using Ocow.EventBus.RabbitMq.Interfaces;
+using Ocow.Inventory.Domain.Enums;
+using Ocow.Inventory.Infrastructure.Data;
+using Ocow.Inventory.Infrastructure.Models;
+
+namespace Ocow.Inventory.Infrastructure.EventHandlers;
+
+/// <summary>
+/// 订单取消集成事件处理器，用于释放仍处于锁定状态的库存。
+/// </summary>
+public sealed class OrderCanceledIntegrationEventHandler : IIntegrationEventHandler<OrderCanceledIntegrationEvent>
+{
+    private const string EventName = "ocow.orders.canceled";
+
+    private readonly ICapTransactionalExecutor<InventoryDbContext> _transactionalExecutor;
+    private readonly ILogger<OrderCanceledIntegrationEventHandler> _logger;
+
+    /// <summary>
+    /// 创建订单取消集成事件处理器。
+    /// </summary>
+    public OrderCanceledIntegrationEventHandler(
+        ICapTransactionalExecutor<InventoryDbContext> transactionalExecutor,
+        ILogger<OrderCanceledIntegrationEventHandler> logger)
+    {
+        _transactionalExecutor = transactionalExecutor;
+        _logger = logger;
+    }
+
+    /// <summary>
+    /// 处理订单取消事件并释放库存锁。
+    /// </summary>
+    public Task HandleAsync(OrderCanceledIntegrationEvent integrationEvent, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(integrationEvent);
+
+        return _transactionalExecutor.ExecuteAsync(async (dbContext, _, ct) =>
+        {
+            if (await dbContext.ProcessedIntegrationEvents.AnyAsync(x => x.EventId == integrationEvent.Id, ct))
+            {
+                _logger.LogInformation("订单取消事件 {EventId} 已处理，跳过重复释放。", integrationEvent.Id);
+                return;
+            }
+
+            var inventoryLock = await dbContext.InventoryLocks
+                .Include(x => x.Items)
+                .FirstOrDefaultAsync(x => x.OrderId == integrationEvent.OrderId, ct);
+
+            if (inventoryLock is not null && inventoryLock.Status == InventoryLockStatusEnum.Locked)
+            {
+                foreach (var lockItem in inventoryLock.Items)
+                {
+                    var inventoryItem = await dbContext.InventoryItems
+                        .FirstAsync(x => x.SkuId == lockItem.SkuId, ct);
+                    inventoryItem.Release(lockItem.Quantity);
+                }
+
+                inventoryLock.Release();
+            }
+
+            dbContext.ProcessedIntegrationEvents.Add(new ProcessedIntegrationEvent
+            {
+                EventId = integrationEvent.Id,
+                EventName = EventName,
+                ProcessedAtUtc = DateTime.UtcNow
+            });
+        }, cancellationToken);
+    }
+}
