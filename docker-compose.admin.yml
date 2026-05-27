@@ -1,0 +1,20 @@
+name: ocow-admin
+
+services:
+  admin-web:
+    build:
+      context: ./src/Admin/Ocow.Admin.Web
+      dockerfile: Dockerfile
+    container_name: ocow-admin-web
+    ports:
+      - "${ADMIN_WEB_PORT:-8088}:80"
+    environment:
+      GATEWAY_BASE_URL: "${GATEWAY_BASE_URL:-http://host.docker.internal:5000}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - ocow-admin
+
+networks:
+  ocow-admin:
+    driver: bridge

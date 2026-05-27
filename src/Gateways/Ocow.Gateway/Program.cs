@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddOcowObservability();
 
 builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
+builder.Configuration.AddJsonFile($"ocelot.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 builder.Services.AddOcowRedis(builder.Configuration);
 builder.Services.AddOcowCache(builder.Configuration);
 builder.Services.AddOcowAuth(builder.Configuration);
