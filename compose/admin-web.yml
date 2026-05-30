@@ -1,27 +1,28 @@
-name: ocow-admin
+name: ocow
 
 services:
-  admin-web:
+  ocow-admin-web:
     build:
-      context: ./src/Admin/Ocow.Admin.Web
+      context: ../src/Admin/Ocow.Admin.Web
       dockerfile: Dockerfile
     container_name: ocow-admin-web
-    ports:
-      - "${ADMIN_WEB_PORT:-8088}:80"
+    restart: unless-stopped
     environment:
-      GATEWAY_BASE_URL: "${GATEWAY_BASE_URL:-http://host.docker.internal:5000}"
+      GATEWAY_BASE_URL: "${GATEWAY_BASE_URL:-http://ocow-gateway:8080}"
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    restart: unless-stopped
+    ports:
+      - "${OCOW_ADMIN_WEB_PORT:-8088}:80"
+    networks:
+      - ocow-net
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost/ >/dev/null 2>&1 || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 10
       start_period: 10s
-    networks:
-      - ocow-admin
 
 networks:
-  ocow-admin:
+  ocow-net:
+    name: ocow-net
     driver: bridge

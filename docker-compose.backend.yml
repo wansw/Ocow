@@ -1,0 +1,259 @@
+name: ocow-backend
+
+x-common-api-env: &common-api-env
+  ASPNETCORE_ENVIRONMENT: "Docker"
+  ASPNETCORE_URLS: "http://+:8080"
+  Logging__LogLevel__Default: "Information"
+  Jwt__Secret: "${OCOW_JWT_SECRET:-OcowIdentityJwtSecret@2026-ChangeInProduction}"
+  Jwt__Issuer: "${OCOW_JWT_ISSUER:-Ocow.Identity}"
+  Jwt__Audience: "${OCOW_JWT_AUDIENCE:-Ocow.Clients}"
+  GatewayForwardedJwt__Enabled: "true"
+  GatewayForwardedJwt__AllowDirectIdentityJwt: "false"
+  GatewayForwardedJwt__Secret: "${OCOW_GATEWAY_FORWARDED_JWT_SECRET:-PleaseChangeThisGatewayForwardedJwtSecret}"
+  GatewayForwardedJwt__Issuer: "${OCOW_GATEWAY_FORWARDED_JWT_ISSUER:-Ocow.Gateway}"
+  GatewayForwardedJwt__Audience: "${OCOW_GATEWAY_FORWARDED_JWT_AUDIENCE:-Ocow.InternalServices}"
+  InternalAuth__Secret: "${OCOW_INTERNAL_AUTH_SECRET:-PleaseChangeThisInternalServiceJwtSecret}"
+  HmacSignature__Secret: "${OCOW_HMAC_SIGNATURE_SECRET:-PleaseChangeThisInternalHmacSecret}"
+  Redis__Configuration: "ocow-redis:6379,abortConnect=false"
+
+x-gateway-env: &gateway-env
+  ASPNETCORE_ENVIRONMENT: "Docker"
+  ASPNETCORE_URLS: "http://+:8080"
+  Logging__LogLevel__Default: "Information"
+  Jwt__Secret: "${OCOW_JWT_SECRET:-OcowIdentityJwtSecret@2026-ChangeInProduction}"
+  Jwt__Issuer: "${OCOW_JWT_ISSUER:-Ocow.Identity}"
+  Jwt__Audience: "${OCOW_JWT_AUDIENCE:-Ocow.Clients}"
+  GatewayForwardedJwt__Enabled: "false"
+  GatewayForwardedJwt__Secret: "${OCOW_GATEWAY_FORWARDED_JWT_SECRET:-PleaseChangeThisGatewayForwardedJwtSecret}"
+  GatewayForwardedJwt__Issuer: "${OCOW_GATEWAY_FORWARDED_JWT_ISSUER:-Ocow.Gateway}"
+  GatewayForwardedJwt__Audience: "${OCOW_GATEWAY_FORWARDED_JWT_AUDIENCE:-Ocow.InternalServices}"
+  InternalAuth__Secret: "${OCOW_INTERNAL_AUTH_SECRET:-PleaseChangeThisInternalServiceJwtSecret}"
+  HmacSignature__Secret: "${OCOW_HMAC_SIGNATURE_SECRET:-PleaseChangeThisInternalHmacSecret}"
+  Redis__Configuration: "ocow-redis:6379,abortConnect=false"
+
+x-postgres-connection:
+  identity: &identity-db "Host=ocow-postgres;Port=5432;Database=${OCOW_IDENTITY_DB_NAME:-ocow_identity};Username=${OCOW_POSTGRES_USER:-postgres};Password=${OCOW_POSTGRES_PASSWORD:-postgres123};Include Error Detail=true"
+  order: &order-db "Host=ocow-postgres;Port=5432;Database=${OCOW_ORDER_DB_NAME:-ocow_order};Username=${OCOW_POSTGRES_USER:-postgres};Password=${OCOW_POSTGRES_PASSWORD:-postgres123};Include Error Detail=true"
+  jobs: &jobs-db "Host=ocow-postgres;Port=5432;Database=${OCOW_JOBS_DB_NAME:-ocow_jobs};Username=${OCOW_POSTGRES_USER:-postgres};Password=${OCOW_POSTGRES_PASSWORD:-postgres123};Include Error Detail=true"
+
+services:
+  ocow-postgres:
+    image: postgres:17-alpine
+    container_name: ocow-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: "${OCOW_POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${OCOW_POSTGRES_PASSWORD:-postgres123}"
+      POSTGRES_DB: "${OCOW_POSTGRES_DB:-postgres}"
+    ports:
+      - "${OCOW_POSTGRES_PORT:-15432}:5432"
+    volumes:
+      - ocow-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  ocow-redis:
+    image: redis:7-alpine
+    container_name: ocow-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${OCOW_REDIS_PORT:-16379}:6379"
+    volumes:
+      - ocow-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  ocow-rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: ocow-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: "${OCOW_RABBITMQ_USER:-admin}"
+      RABBITMQ_DEFAULT_PASS: "${OCOW_RABBITMQ_PASSWORD:-admin123}"
+    ports:
+      - "${OCOW_RABBITMQ_PORT:-15670}:5672"
+      - "${OCOW_RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+    volumes:
+      - ocow-rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  identity-migrations:
+    build:
+      context: .
+      dockerfile: docker/dotnet/Dockerfile
+      args:
+        PROJECT_PATH: src/Services/Identity/Ocow.Identity.Migrations/Ocow.Identity.Migrations.csproj
+    container_name: ocow-identity-migrations
+    command: ["Ocow.Identity.Migrations.dll", "init"]
+    restart: "no"
+    depends_on:
+      ocow-postgres:
+        condition: service_healthy
+    environment:
+      OCOW_IDENTITY_DB_CONNECTION_STRING: *identity-db
+      OCOW_IDENTITY_DB_PROVIDER: "PostgreSql"
+      OCOW_IDENTITY_ADMIN_USERNAME: "${OCOW_IDENTITY_ADMIN_USERNAME:-admin}"
+      OCOW_IDENTITY_ADMIN_PASSWORD: "${OCOW_IDENTITY_ADMIN_PASSWORD:-Admin@123456}"
+      OCOW_IDENTITY_ADMIN_DISPLAY_NAME: "${OCOW_IDENTITY_ADMIN_DISPLAY_NAME:-系统管理员}"
+
+  order-migrations:
+    build:
+      context: .
+      dockerfile: docker/dotnet/Dockerfile
+      args:
+        PROJECT_PATH: src/Services/Order/Ocow.Order.Migrations/Ocow.Order.Migrations.csproj
+    container_name: ocow-order-migrations
+    command: ["Ocow.Order.Migrations.dll", "init"]
+    restart: "no"
+    depends_on:
+      ocow-postgres:
+        condition: service_healthy
+    environment:
+      OCOW_ORDER_DB_CONNECTION_STRING: *order-db
+      OCOW_ORDER_DB_PROVIDER: "PostgreSql"
+
+  jobs-migrations:
+    build:
+      context: .
+      dockerfile: docker/dotnet/Dockerfile
+      args:
+        PROJECT_PATH: src/Services/Jobs/Ocow.Jobs.Migrations/Ocow.Jobs.Migrations.csproj
+    container_name: ocow-jobs-migrations
+    command: ["Ocow.Jobs.Migrations.dll", "init"]
+    restart: "no"
+    depends_on:
+      ocow-postgres:
+        condition: service_healthy
+    environment:
+      OCOW_JOBS_DB_CONNECTION_STRING: *jobs-db
+      OCOW_JOBS_DB_PROVIDER: "PostgreSql"
+
+  ocow-identity-api:
+    build:
+      context: .
+      dockerfile: docker/dotnet/Dockerfile
+      args:
+        PROJECT_PATH: src/Services/Identity/Ocow.Identity.Api/Ocow.Identity.Api.csproj
+    container_name: ocow-identity-api
+    command: ["Ocow.Identity.Api.dll"]
+    restart: unless-stopped
+    depends_on:
+      identity-migrations:
+        condition: service_completed_successfully
+      ocow-redis:
+        condition: service_healthy
+    environment:
+      <<: *common-api-env
+      Database__Provider: "PostgreSql"
+      Database__ConnectionString: *identity-db
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  ocow-order-api:
+    build:
+      context: .
+      dockerfile: docker/dotnet/Dockerfile
+      args:
+        PROJECT_PATH: src/Services/Order/Ocow.Order.Api/Ocow.Order.Api.csproj
+    container_name: ocow-order-api
+    command: ["Ocow.Order.Api.dll"]
+    restart: unless-stopped
+    depends_on:
+      order-migrations:
+        condition: service_completed_successfully
+      ocow-redis:
+        condition: service_healthy
+      ocow-rabbitmq:
+        condition: service_healthy
+    environment:
+      <<: *common-api-env
+      Database__Provider: "PostgreSql"
+      Database__ConnectionString: *order-db
+      ConnectionStrings__Default: *order-db
+      EventBus__RabbitMq__HostName: "ocow-rabbitmq"
+      EventBus__RabbitMq__Port: "5672"
+      EventBus__RabbitMq__UserName: "${OCOW_RABBITMQ_USER:-admin}"
+      EventBus__RabbitMq__Password: "${OCOW_RABBITMQ_PASSWORD:-admin123}"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  ocow-jobs-api:
+    build:
+      context: .
+      dockerfile: docker/dotnet/Dockerfile
+      args:
+        PROJECT_PATH: src/Services/Jobs/Ocow.Jobs/Ocow.Jobs.Api.csproj
+    container_name: ocow-jobs-api
+    command: ["Ocow.Jobs.Api.dll"]
+    restart: unless-stopped
+    depends_on:
+      jobs-migrations:
+        condition: service_completed_successfully
+      ocow-redis:
+        condition: service_healthy
+    environment:
+      <<: *common-api-env
+      Database__Provider: "PostgreSql"
+      Database__ConnectionString: *jobs-db
+      BackgroundJobs__StorageConnectionString: *jobs-db
+      ServiceEndpoints__Services__ocow-order-api: "http://ocow-order-api:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  ocow-gateway:
+    build:
+      context: .
+      dockerfile: docker/dotnet/Dockerfile
+      args:
+        PROJECT_PATH: src/Gateways/Ocow.Gateway/Ocow.Gateway.csproj
+    container_name: ocow-gateway
+    command: ["Ocow.Gateway.dll"]
+    restart: unless-stopped
+    depends_on:
+      ocow-identity-api:
+        condition: service_healthy
+      ocow-order-api:
+        condition: service_healthy
+      ocow-jobs-api:
+        condition: service_healthy
+    environment:
+      <<: *gateway-env
+    ports:
+      - "${OCOW_GATEWAY_PORT:-5000}:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health/identity"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+volumes:
+  ocow-postgres-data:
+  ocow-redis-data:
+  ocow-rabbitmq-data:

@@ -165,6 +165,14 @@ public class RefreshTokenTests
             throw new NotSupportedException();
         }
 
+        /// <summary>
+        /// 刷新 Token 测试中不查询 unionid。
+        /// </summary>
+        public Task<MemberIdentity?> GetMemberIdentityByUnionIdAsync(string unionId, CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
+
         public Task SaveMemberIdentityAsync(MemberIdentity memberIdentity, CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();

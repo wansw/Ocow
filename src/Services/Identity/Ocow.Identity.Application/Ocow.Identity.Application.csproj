@@ -6,6 +6,7 @@
     <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.Cache\Ocow.Cache.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.Shared\Ocow.Shared.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.EntityFrameworkCore\Ocow.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Ocow.WeChat.Abstractions\Ocow.WeChat.Abstractions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

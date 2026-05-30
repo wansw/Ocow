@@ -1,0 +1,60 @@
+name: ocow
+
+x-postgres-connection:
+  identity: &identity-db "Host=ocow-postgres;Port=5432;Database=${OCOW_IDENTITY_DB_NAME:-ocow_identity};Username=${OCOW_POSTGRES_USER:-postgres};Password=${OCOW_POSTGRES_PASSWORD:-postgres123};Include Error Detail=true"
+  order: &order-db "Host=ocow-postgres;Port=5432;Database=${OCOW_ORDER_DB_NAME:-ocow_order};Username=${OCOW_POSTGRES_USER:-postgres};Password=${OCOW_POSTGRES_PASSWORD:-postgres123};Include Error Detail=true"
+  jobs: &jobs-db "Host=ocow-postgres;Port=5432;Database=${OCOW_JOBS_DB_NAME:-ocow_jobs};Username=${OCOW_POSTGRES_USER:-postgres};Password=${OCOW_POSTGRES_PASSWORD:-postgres123};Include Error Detail=true"
+
+services:
+  identity-migrations:
+    build:
+      context: ..
+      dockerfile: docker/dotnet/Dockerfile
+      args:
+        PROJECT_PATH: src/Services/Identity/Ocow.Identity.Migrations/Ocow.Identity.Migrations.csproj
+    container_name: ocow-identity-migrations
+    command: ["Ocow.Identity.Migrations.dll", "init"]
+    restart: "no"
+    environment:
+      OCOW_IDENTITY_DB_CONNECTION_STRING: *identity-db
+      OCOW_IDENTITY_DB_PROVIDER: "PostgreSql"
+      OCOW_IDENTITY_ADMIN_USERNAME: "${OCOW_IDENTITY_ADMIN_USERNAME:-admin}"
+      OCOW_IDENTITY_ADMIN_PASSWORD: "${OCOW_IDENTITY_ADMIN_PASSWORD:-Admin@123456}"
+      OCOW_IDENTITY_ADMIN_DISPLAY_NAME: "${OCOW_IDENTITY_ADMIN_DISPLAY_NAME:-系统管理员}"
+    networks:
+      - ocow-net
+
+  order-migrations:
+    build:
+      context: ..
+      dockerfile: docker/dotnet/Dockerfile
+      args:
+        PROJECT_PATH: src/Services/Order/Ocow.Order.Migrations/Ocow.Order.Migrations.csproj
+    container_name: ocow-order-migrations
+    command: ["Ocow.Order.Migrations.dll", "init"]
+    restart: "no"
+    environment:
+      OCOW_ORDER_DB_CONNECTION_STRING: *order-db
+      OCOW_ORDER_DB_PROVIDER: "PostgreSql"
+    networks:
+      - ocow-net
+
+  jobs-migrations:
+    build:
+      context: ..
+      dockerfile: docker/dotnet/Dockerfile
+      args:
+        PROJECT_PATH: src/Services/Jobs/Ocow.Jobs.Migrations/Ocow.Jobs.Migrations.csproj
+    container_name: ocow-jobs-migrations
+    command: ["Ocow.Jobs.Migrations.dll", "init"]
+    restart: "no"
+    environment:
+      OCOW_JOBS_DB_CONNECTION_STRING: *jobs-db
+      OCOW_JOBS_DB_PROVIDER: "PostgreSql"
+    networks:
+      - ocow-net
+
+networks:
+  ocow-net:
+    name: ocow-net
+    driver: bridge

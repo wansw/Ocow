@@ -208,6 +208,14 @@ public class IdentityRepository : EfRepositoryBase<IdentityDbContext, AdminUser,
     }
 
     /// <summary>
+    /// 根据 unionid 查询会员身份。
+    /// </summary>
+    public async Task<MemberIdentity?> GetMemberIdentityByUnionIdAsync(string unionId, CancellationToken cancellationToken = default)
+    {
+        return await DbContext.MemberIdentities.FirstOrDefaultAsync(x => x.UnionId == unionId, cancellationToken);
+    }
+
+    /// <summary>
     /// 保存会员身份。
     /// </summary>
     public async Task SaveMemberIdentityAsync(MemberIdentity memberIdentity, CancellationToken cancellationToken = default)

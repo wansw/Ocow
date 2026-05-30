@@ -1,0 +1,101 @@
+name: ocow
+
+x-common-api-env: &common-api-env
+  ASPNETCORE_ENVIRONMENT: "Docker"
+  ASPNETCORE_URLS: "http://+:8080"
+  Logging__LogLevel__Default: "Information"
+  Jwt__Secret: "${OCOW_JWT_SECRET:-OcowIdentityJwtSecret@2026-ChangeInProduction}"
+  Jwt__Issuer: "${OCOW_JWT_ISSUER:-Ocow.Identity}"
+  Jwt__Audience: "${OCOW_JWT_AUDIENCE:-Ocow.Clients}"
+  GatewayForwardedJwt__Enabled: "true"
+  GatewayForwardedJwt__AllowDirectIdentityJwt: "false"
+  GatewayForwardedJwt__Secret: "${OCOW_GATEWAY_FORWARDED_JWT_SECRET:-PleaseChangeThisGatewayForwardedJwtSecret}"
+  GatewayForwardedJwt__Issuer: "${OCOW_GATEWAY_FORWARDED_JWT_ISSUER:-Ocow.Gateway}"
+  GatewayForwardedJwt__Audience: "${OCOW_GATEWAY_FORWARDED_JWT_AUDIENCE:-Ocow.InternalServices}"
+  InternalAuth__Secret: "${OCOW_INTERNAL_AUTH_SECRET:-PleaseChangeThisInternalServiceJwtSecret}"
+  HmacSignature__Secret: "${OCOW_HMAC_SIGNATURE_SECRET:-PleaseChangeThisInternalHmacSecret}"
+  Redis__Configuration: "ocow-redis:6379,abortConnect=false"
+
+x-postgres-connection:
+  identity: &identity-db "Host=ocow-postgres;Port=5432;Database=${OCOW_IDENTITY_DB_NAME:-ocow_identity};Username=${OCOW_POSTGRES_USER:-postgres};Password=${OCOW_POSTGRES_PASSWORD:-postgres123};Include Error Detail=true"
+  order: &order-db "Host=ocow-postgres;Port=5432;Database=${OCOW_ORDER_DB_NAME:-ocow_order};Username=${OCOW_POSTGRES_USER:-postgres};Password=${OCOW_POSTGRES_PASSWORD:-postgres123};Include Error Detail=true"
+  jobs: &jobs-db "Host=ocow-postgres;Port=5432;Database=${OCOW_JOBS_DB_NAME:-ocow_jobs};Username=${OCOW_POSTGRES_USER:-postgres};Password=${OCOW_POSTGRES_PASSWORD:-postgres123};Include Error Detail=true"
+
+services:
+  ocow-identity-api:
+    build:
+      context: ..
+      dockerfile: docker/dotnet/Dockerfile
+      args:
+        PROJECT_PATH: src/Services/Identity/Ocow.Identity.Api/Ocow.Identity.Api.csproj
+    container_name: ocow-identity-api
+    command: ["Ocow.Identity.Api.dll"]
+    restart: unless-stopped
+    environment:
+      <<: *common-api-env
+      Database__Provider: "PostgreSql"
+      Database__ConnectionString: *identity-db
+    networks:
+      - ocow-net
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  ocow-order-api:
+    build:
+      context: ..
+      dockerfile: docker/dotnet/Dockerfile
+      args:
+        PROJECT_PATH: src/Services/Order/Ocow.Order.Api/Ocow.Order.Api.csproj
+    container_name: ocow-order-api
+    command: ["Ocow.Order.Api.dll"]
+    restart: unless-stopped
+    environment:
+      <<: *common-api-env
+      Database__Provider: "PostgreSql"
+      Database__ConnectionString: *order-db
+      ConnectionStrings__Default: *order-db
+      EventBus__RabbitMq__HostName: "ocow-rabbitmq"
+      EventBus__RabbitMq__Port: "5672"
+      EventBus__RabbitMq__UserName: "${OCOW_RABBITMQ_USER:-admin}"
+      EventBus__RabbitMq__Password: "${OCOW_RABBITMQ_PASSWORD:-admin123}"
+    networks:
+      - ocow-net
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  ocow-jobs-api:
+    build:
+      context: ..
+      dockerfile: docker/dotnet/Dockerfile
+      args:
+        PROJECT_PATH: src/Services/Jobs/Ocow.Jobs/Ocow.Jobs.Api.csproj
+    container_name: ocow-jobs-api
+    command: ["Ocow.Jobs.Api.dll"]
+    restart: unless-stopped
+    environment:
+      <<: *common-api-env
+      Database__Provider: "PostgreSql"
+      Database__ConnectionString: *jobs-db
+      BackgroundJobs__StorageConnectionString: *jobs-db
+      ServiceEndpoints__Services__ocow-order-api: "http://ocow-order-api:8080"
+    networks:
+      - ocow-net
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+networks:
+  ocow-net:
+    name: ocow-net
+    driver: bridge

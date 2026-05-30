@@ -7,6 +7,7 @@ using Ocow.Identity.Infrastructure.Extensions;
 using Ocow.InternalAuth.Extensions;
 using Ocow.Observability.Extensions;
 using Ocow.Redis.Extensions;
+using Ocow.WeChat.Http.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,7 @@ builder.Services.AddOcowHealthChecks(builder.Configuration, "Ocow.Identity.Api",
 
 builder.Services.AddOcowRedis(builder.Configuration);
 builder.Services.AddOcowCache(builder.Configuration);
+builder.Services.AddOcowWechat(builder.Configuration);
 builder.Services.AddIdentityApplication(builder.Configuration);
 builder.Services.AddIdentityInfrastructure(builder.Configuration);
 builder.Services.AddOcowAuth(builder.Configuration);

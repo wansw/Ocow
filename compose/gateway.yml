@@ -1,0 +1,44 @@
+name: ocow
+
+x-gateway-env: &gateway-env
+  ASPNETCORE_ENVIRONMENT: "Docker"
+  ASPNETCORE_URLS: "http://+:8080"
+  Logging__LogLevel__Default: "Information"
+  Jwt__Secret: "${OCOW_JWT_SECRET:-OcowIdentityJwtSecret@2026-ChangeInProduction}"
+  Jwt__Issuer: "${OCOW_JWT_ISSUER:-Ocow.Identity}"
+  Jwt__Audience: "${OCOW_JWT_AUDIENCE:-Ocow.Clients}"
+  GatewayForwardedJwt__Enabled: "false"
+  GatewayForwardedJwt__Secret: "${OCOW_GATEWAY_FORWARDED_JWT_SECRET:-PleaseChangeThisGatewayForwardedJwtSecret}"
+  GatewayForwardedJwt__Issuer: "${OCOW_GATEWAY_FORWARDED_JWT_ISSUER:-Ocow.Gateway}"
+  GatewayForwardedJwt__Audience: "${OCOW_GATEWAY_FORWARDED_JWT_AUDIENCE:-Ocow.InternalServices}"
+  InternalAuth__Secret: "${OCOW_INTERNAL_AUTH_SECRET:-PleaseChangeThisInternalServiceJwtSecret}"
+  HmacSignature__Secret: "${OCOW_HMAC_SIGNATURE_SECRET:-PleaseChangeThisInternalHmacSecret}"
+  Redis__Configuration: "ocow-redis:6379,abortConnect=false"
+
+services:
+  ocow-gateway:
+    build:
+      context: ..
+      dockerfile: docker/dotnet/Dockerfile
+      args:
+        PROJECT_PATH: src/Gateways/Ocow.Gateway/Ocow.Gateway.csproj
+    container_name: ocow-gateway
+    command: ["Ocow.Gateway.dll"]
+    restart: unless-stopped
+    environment:
+      <<: *gateway-env
+    ports:
+      - "${OCOW_GATEWAY_PORT:-5000}:8080"
+    networks:
+      - ocow-net
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health/identity"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+networks:
+  ocow-net:
+    name: ocow-net
+    driver: bridge

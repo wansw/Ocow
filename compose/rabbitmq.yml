@@ -1,0 +1,32 @@
+name: ocow
+
+services:
+  ocow-rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: ocow-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: "${OCOW_RABBITMQ_USER:-admin}"
+      RABBITMQ_DEFAULT_PASS: "${OCOW_RABBITMQ_PASSWORD:-admin123}"
+    ports:
+      - "${OCOW_RABBITMQ_PORT:-15670}:5672"
+      - "${OCOW_RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+    volumes:
+      - ocow-rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - ocow-net
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+volumes:
+  ocow-rabbitmq-data:
+    name: ocow-rabbitmq-data
+
+networks:
+  ocow-net:
+    name: ocow-net
+    driver: bridge

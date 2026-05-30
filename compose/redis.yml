@@ -1,0 +1,29 @@
+name: ocow
+
+services:
+  ocow-redis:
+    image: redis:7-alpine
+    container_name: ocow-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${OCOW_REDIS_PORT:-16379}:6379"
+    volumes:
+      - ocow-redis-data:/data
+    networks:
+      - ocow-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  ocow-redis-data:
+    name: ocow-redis-data
+
+networks:
+  ocow-net:
+    name: ocow-net
+    driver: bridge

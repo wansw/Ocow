@@ -41,6 +41,7 @@
     <ProjectReference Include="..\..\src\BuildingBlocks\Ocow.EntityFrameworkCore\Ocow.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\..\src\BuildingBlocks\Ocow.EventBus.Abstractions\Ocow.EventBus.Abstractions.csproj" />
     <ProjectReference Include="..\..\src\BuildingBlocks\Ocow.EventBus.RabbitMq\Ocow.EventBus.RabbitMq.csproj" />
+    <ProjectReference Include="..\..\src\BuildingBlocks\Ocow.WeChat.Abstractions\Ocow.WeChat.Abstractions.csproj" />
     <ProjectReference Include="..\..\src\Services\Identity\Ocow.Identity.Infrastructure\Ocow.Identity.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Services\Identity\Ocow.Identity.Migrations\Ocow.Identity.Migrations.csproj" />
     <ProjectReference Include="..\..\src\Services\Jobs\Ocow.Jobs\Ocow.Jobs.Api.csproj" />

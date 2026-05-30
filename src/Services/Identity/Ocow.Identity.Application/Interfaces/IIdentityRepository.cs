@@ -74,6 +74,11 @@ public interface IIdentityRepository
     Task<MemberIdentity?> GetMemberIdentityByOpenIdAsync(string openId, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// 根据 unionid 查询会员身份。
+    /// </summary>
+    Task<MemberIdentity?> GetMemberIdentityByUnionIdAsync(string unionId, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// 保存会员身份。
     /// </summary>
     Task SaveMemberIdentityAsync(MemberIdentity memberIdentity, CancellationToken cancellationToken = default);

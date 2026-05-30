@@ -1,0 +1,32 @@
+name: ocow
+
+services:
+  ocow-postgres:
+    image: postgres:17-alpine
+    container_name: ocow-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: "${OCOW_POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${OCOW_POSTGRES_PASSWORD:-postgres123}"
+      POSTGRES_DB: "${OCOW_POSTGRES_DB:-postgres}"
+    ports:
+      - "${OCOW_POSTGRES_PORT:-15432}:5432"
+    volumes:
+      - ocow-postgres-data:/var/lib/postgresql/data
+    networks:
+      - ocow-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+volumes:
+  ocow-postgres-data:
+    name: ocow-postgres-data
+
+networks:
+  ocow-net:
+    name: ocow-net
+    driver: bridge

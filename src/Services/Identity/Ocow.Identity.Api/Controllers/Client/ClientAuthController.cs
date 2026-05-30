@@ -37,6 +37,26 @@ public class ClientAuthController : BaseController
     }
 
     /// <summary>
+    /// 创建公众号网页登录一次性 state。
+    /// </summary>
+    [HttpPost("wechat-official-account-state")]
+    public async Task<ApiResDto<WechatOfficialAccountStateResDto>> CreateWechatOfficialAccountLoginStateAsync(CancellationToken cancellationToken)
+    {
+        var state = await _clientAuthAppService.CreateWechatOfficialAccountLoginStateAsync(cancellationToken);
+        return Success(state);
+    }
+
+    /// <summary>
+    /// 公众号微信登录并签发 Customer JWT。
+    /// </summary>
+    [HttpPost("wechat-official-account-login")]
+    public async Task<ApiResDto<AuthTokenResDto>> WechatOfficialAccountLoginAsync([FromBody] WechatOfficialAccountLoginReqDto reqDto, CancellationToken cancellationToken)
+    {
+        var token = await _clientAuthAppService.WechatOfficialAccountLoginAsync(reqDto, cancellationToken);
+        return Success(token);
+    }
+
+    /// <summary>
     /// 刷新小程。Token。    
     /// </summary>
     [HttpPost("refresh-token")]
