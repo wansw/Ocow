@@ -46,6 +46,10 @@
     <ProjectReference Include="..\..\src\Services\Identity\Ocow.Identity.Migrations\Ocow.Identity.Migrations.csproj" />
     <ProjectReference Include="..\..\src\Services\Jobs\Ocow.Jobs\Ocow.Jobs.Api.csproj" />
     <ProjectReference Include="..\..\src\Gateways\Ocow.Gateway\Ocow.Gateway.csproj" />
+    <ProjectReference Include="..\..\src\Services\File\Ocow.File.Application\Ocow.File.Application.csproj" />
+    <ProjectReference Include="..\..\src\Services\File\Ocow.File.Domain\Ocow.File.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Services\File\Ocow.File.Infrastructure\Ocow.File.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Services\File\Ocow.File.Api\Ocow.File.Api.csproj" />
   </ItemGroup>
 
 </Project>
